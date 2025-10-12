@@ -1,0 +1,36 @@
+{
+    "SamplePlaceHolders": [
+        {
+        "{{ticket.subject}}" : "Help! Unable to Print",
+        "{{ticket.desc}}" : "The printer by pillar G4 isn't printing anymore. Please check.",
+        "{{ticket.number}}" : "1001",
+        "{{contact.name}}" : "John Galt",
+        "{{contact.email}}" : "john.galt@example.com",
+        "{{ticket.status}}": "Open",
+        "{{ticket.priority}}": "Low",
+        "{{ticket.source}}": "Email",
+        "{{company.name}}": "Sample Company",
+        "{{company.domains}}": "example.com, test.com",
+        "{{ticket.agentName}}": "Assigned Agent Name",
+        "{{ticket.agentEmail}}": "assignedagent@yourdomain.com",
+        "{{group.name}}": "Sample Group",
+        "{{replied_content}}": "Sample Replied Content",
+        "{{note_content}}": "Sample Note Content",
+        "{{ticket.type}}": "Question",
+        "{{ticket.category}}": "Billing",
+        "{{ticket.subcategory}}": "Disputed Charge",
+        "{{ticket.group}}": "L1 Support",
+        "{{ticket.repliedContent}}": "We are looking at it.",
+        "{{approval.subject}}": "Sample Approval Subject",
+        "{{approval.description}}": "Sample Approval Description",
+        "{{approval.status}}": "Pending",
+        "{{approval.type}}": "Anyone has to approve",
+        "{{approval.actionPerformedByName}}": "Dagny Taggart",
+        "{{approval.actionPerformedByEmail}}": "dagny@example.com",
+        "{{approver.note}}": "Sample Approver Note!",
+        "{{requestor.name}}": "Hank Rearden",
+        "{{requestor.email}}": "hank@example.com"
+        }
+    ]
+
+}

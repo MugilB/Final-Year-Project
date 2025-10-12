@@ -1,0 +1,8 @@
+{
+    "Signature":[
+        {
+            "Signed In Agent Name": "{{signedInAgent.name}}",
+            "Signed In Agent Email": "{{signedInAgent.email}}"
+        }
+    ]
+}

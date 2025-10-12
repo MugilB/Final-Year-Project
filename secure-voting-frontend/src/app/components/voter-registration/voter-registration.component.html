@@ -1,0 +1,240 @@
+<div class="registration-container">
+  <div class="registration-card">
+    <div class="registration-header">
+      <button class="btn-back" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2>New Voter Registration</h2>
+      <p>Fill out the form below to register as a new voter</p>
+    </div>
+
+    <form [formGroup]="voterForm" (ngSubmit)="onSubmit()" class="registration-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name *</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            class="form-control"
+            [class.error]="getFieldError('firstName')"
+            placeholder="Enter your first name"
+          />
+          <div class="error-message" *ngIf="getFieldError('firstName')">
+            {{ getFieldError('firstName') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name *</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            class="form-control"
+            [class.error]="getFieldError('lastName')"
+            placeholder="Enter your last name"
+          />
+          <div class="error-message" *ngIf="getFieldError('lastName')">
+            {{ getFieldError('lastName') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="form-control"
+            [class.error]="getFieldError('email')"
+            placeholder="Enter your email address"
+          />
+          <div class="error-message" *ngIf="getFieldError('email')">
+            {{ getFieldError('email') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number *</label>
+          <input
+            type="tel"
+            id="phoneNumber"
+            formControlName="phoneNumber"
+            class="form-control"
+            [class.error]="getFieldError('phoneNumber')"
+            placeholder="Enter your phone number"
+          />
+          <div class="error-message" *ngIf="getFieldError('phoneNumber')">
+            {{ getFieldError('phoneNumber') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dateOfBirth">Date of Birth *</label>
+          <input
+            type="date"
+            id="dateOfBirth"
+            formControlName="dateOfBirth"
+            class="form-control"
+            [class.error]="getFieldError('dateOfBirth')"
+          />
+          <div class="error-message" *ngIf="getFieldError('dateOfBirth')">
+            {{ getFieldError('dateOfBirth') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender *</label>
+          <select
+            id="gender"
+            formControlName="gender"
+            class="form-control"
+            [class.error]="getFieldError('gender')"
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <div class="error-message" *ngIf="getFieldError('gender')">
+            {{ getFieldError('gender') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address *</label>
+        <textarea
+          id="address"
+          formControlName="address"
+          class="form-control textarea"
+          [class.error]="getFieldError('address')"
+          placeholder="Enter your complete address"
+          rows="3"
+        ></textarea>
+        <div class="error-message" *ngIf="getFieldError('address')">
+          {{ getFieldError('address') }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="wardId">Ward *</label>
+          <select
+            id="wardId"
+            formControlName="wardId"
+            class="form-control"
+            [class.error]="getFieldError('wardId')"
+          >
+            <option value="">Select your ward</option>
+            <option *ngFor="let ward of wards" [value]="ward.wardId">
+              {{ ward.wardName }}
+            </option>
+          </select>
+          <div class="error-message" *ngIf="getFieldError('wardId')">
+            {{ getFieldError('wardId') }}
+          </div>
+          <div *ngIf="loadingWards" class="loading-text">
+            Loading wards...
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bloodGroup">Blood Group *</label>
+          <select
+            id="bloodGroup"
+            formControlName="bloodGroup"
+            class="form-control"
+            [class.error]="getFieldError('bloodGroup')"
+          >
+            <option value="">Select Blood Group</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+          <div class="error-message" *ngIf="getFieldError('bloodGroup')">
+            {{ getFieldError('bloodGroup') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="aadharCardLink">Upload Proof (Aadhar Card) - Google Drive Link *</label>
+        <input
+          type="url"
+          id="aadharCardLink"
+          formControlName="aadharCardLink"
+          class="form-control"
+          [class.error]="getFieldError('aadharCardLink')"
+          placeholder="https://drive.google.com/file/d/..."
+        />
+        <div class="field-help">
+          <i class="fas fa-info-circle"></i>
+          Please upload your Aadhar Card to Google Drive and share the public link here
+        </div>
+        <div class="error-message" *ngIf="getFieldError('aadharCardLink')">
+          {{ getFieldError('aadharCardLink') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="profilePictureLink">Upload Profile Picture (Google Drive Link)</label>
+        <input
+          type="url"
+          id="profilePictureLink"
+          formControlName="profilePictureLink"
+          class="form-control"
+          [class.error]="getFieldError('profilePictureLink')"
+          placeholder="https://drive.google.com/file/d/..."
+        />
+        <div class="field-help">
+          <i class="fas fa-info-circle"></i>
+          Please upload your profile picture to Google Drive and share the public link here (Optional)
+        </div>
+        <div class="error-message" *ngIf="getFieldError('profilePictureLink')">
+          {{ getFieldError('profilePictureLink') }}
+        </div>
+      </div>
+
+
+
+      <div class="error-message general-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="success-message" *ngIf="successMessage">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage }}
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="goBack()"
+          [disabled]="isLoading"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading || voterForm.invalid"
+        >
+          <span *ngIf="isLoading" class="spinner"></span>
+          {{ isLoading ? 'Registering...' : 'Register as Voter' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

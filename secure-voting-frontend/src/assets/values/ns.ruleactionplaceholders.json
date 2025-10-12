@@ -1,0 +1,46 @@
+{
+    "Event": [
+        {
+            "Event Type" : "{{event.type}}",
+            "Time" : "{{event.time}}",
+            "Current Timestamp" : "{{event.currentTimestamp}}",
+            "Helpdesk Name" : "{{helpdesk.name}}",
+            "Support Portal URL" : "{{helpdesk.supportUrl}}"
+        }
+    ],
+    "Ticket":[
+        {
+            "Subject" : "{{ticket.subject}}",
+            "Description" : "{{ticket.desc}}",
+            "Ticket URL - Agent Portal " : "{{ticket.agentUrl}}",
+            "Ticket URL - Support Portal " : "{{ticket.supportUrl}}",
+            "Assigned Agent Name" : "{{ticket.agentName}}",
+            "Assigned Agent Email" : "{{ticket.agentEmail}}",
+            "Priority" : "{{ticket.priority}}",
+            "Source" : "{{ticket.source}}",
+            "Status" : "{{ticket.status}}",
+            "Ticket ID" : "{{ticket.number}}",
+            "Type" : "{{ticket.type}}",
+            "Category" : "{{ticket.category}}",
+            "Subcategory" : "{{ticket.subcategory}}",
+            "Group" : "{{ticket.group}}",
+            "Replied Content" : "{{ticket.repliedContent}}",
+            "Last Updated On": "{{ticket.lastUpdatedOn}}",
+            "Created On": "{{ticket.createdOn}}",
+            "Recent Ticket Conversations": "{{ticket.recentConversations}}"
+        }
+    ],
+    "Company":[
+        {
+            "Company Name" : "{{company.name}}",
+            "Company Domains" :"{{company.domains}}"
+        }
+    ],
+    "Contact":[
+        {
+            "Contact Name" : "{{contact.name}}",
+            "Contact Email" : "{{contact.email}}"
+
+        }
+    ]
+}

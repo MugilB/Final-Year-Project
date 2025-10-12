@@ -1,0 +1,258 @@
+<div class="nomination-container">
+  <div class="nomination-card">
+    <div class="nomination-header">
+      <button class="btn-back" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2>Candidate Nomination</h2>
+      <p>Fill out the form below to nominate yourself as a candidate</p>
+    </div>
+
+    <form [formGroup]="candidateForm" (ngSubmit)="onSubmit()" class="nomination-form">
+      <div class="form-row">
+    <div class="form-group">
+      <label for="electionId">Select Election *</label>
+      <select
+        id="electionId"
+        formControlName="electionId"
+        class="form-control"
+        [class.error]="getFieldError('electionId')"
+        [disabled]="loadingElections"
+      >
+        <option value="">Choose an election...</option>
+        <option *ngFor="let election of elections" [value]="election.electionId">
+          {{ election.name }} - {{ formatDate(election.startDate) }}
+        </option>
+      </select>
+      <div class="error-message" *ngIf="getFieldError('electionId')">
+        {{ getFieldError('electionId') }}
+      </div>
+      <div class="field-help" *ngIf="loadingElections">
+        <i class="fas fa-spinner fa-spin"></i>
+        Loading elections...
+      </div>
+      <div class="field-help" *ngIf="!loadingElections && elections.length === 0">
+        <i class="fas fa-info-circle"></i>
+        No elections are currently open for nominations.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="candidateName">Candidate Name *</label>
+      <input
+        type="text"
+        id="candidateName"
+        formControlName="candidateName"
+        class="form-control"
+        [class.error]="getFieldError('candidateName')"
+        placeholder="Enter your full name"
+      />
+      <div class="error-message" *ngIf="getFieldError('candidateName')">
+        {{ getFieldError('candidateName') }}
+      </div>
+    </div>
+
+        <div class="form-group">
+          <label for="gender">Gender *</label>
+          <select
+            id="gender"
+            formControlName="gender"
+            class="form-control"
+            [class.error]="getFieldError('gender')"
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <div class="error-message" *ngIf="getFieldError('gender')">
+            {{ getFieldError('gender') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="age">Age *</label>
+          <input
+            type="number"
+            id="age"
+            formControlName="age"
+            class="form-control"
+            [class.error]="getFieldError('age')"
+            placeholder="Enter your age"
+            min="18"
+            max="100"
+          />
+          <div class="error-message" *ngIf="getFieldError('age')">
+            {{ getFieldError('age') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number *</label>
+          <input
+            type="tel"
+            id="phoneNumber"
+            formControlName="phoneNumber"
+            class="form-control"
+            [class.error]="getFieldError('phoneNumber')"
+            placeholder="Enter your phone number"
+          />
+          <div class="error-message" *ngIf="getFieldError('phoneNumber')">
+            {{ getFieldError('phoneNumber') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address *</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          [class.error]="getFieldError('email')"
+          placeholder="Enter your email address"
+        />
+        <div class="error-message" *ngIf="getFieldError('email')">
+          {{ getFieldError('email') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address *</label>
+        <textarea
+          id="address"
+          formControlName="address"
+          class="form-control textarea"
+          [class.error]="getFieldError('address')"
+          placeholder="Enter your complete address"
+          rows="3"
+        ></textarea>
+        <div class="error-message" *ngIf="getFieldError('address')">
+          {{ getFieldError('address') }}
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="party">Political Party *</label>
+          <select
+            id="party"
+            formControlName="party"
+            class="form-control"
+            [class.error]="getFieldError('party')"
+          >
+            <option value="">Select Political Party</option>
+            <option value="Independent Candidate">Independent Candidate</option>
+            <option value="Other">Other (Specify below)</option>
+          </select>
+          <div class="error-message" *ngIf="getFieldError('party')">
+            {{ getFieldError('party') }}
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="candidateForm.get('party')?.value === 'Other'">
+          <label for="customParty">Specify Political Party *</label>
+          <input
+            type="text"
+            id="customParty"
+            formControlName="customParty"
+            class="form-control"
+            [class.error]="getFieldError('customParty')"
+            placeholder="Enter your political party name"
+          />
+          <div class="error-message" *ngIf="getFieldError('customParty')">
+            {{ getFieldError('customParty') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="partySecretCode">Party Secret Code *</label>
+          <input
+            type="password"
+            id="partySecretCode"
+            formControlName="partySecretCode"
+            class="form-control"
+            [class.error]="getFieldError('partySecretCode')"
+            [placeholder]="getSecretCodePlaceholder()"
+          />
+          <div class="field-help" *ngIf="candidateForm.get('party')?.value === 'Independent Candidate'">
+            <i class="fas fa-info-circle"></i>
+            For Independent Candidates, use: <strong>INDEPENDENT_SECRET_2024</strong>
+          </div>
+          <div class="error-message" *ngIf="getFieldError('partySecretCode')">
+            {{ getFieldError('partySecretCode') }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="aadharCardLink">Upload Aadhar Card (Google Drive Link) *</label>
+        <input
+          type="url"
+          id="aadharCardLink"
+          formControlName="aadharCardLink"
+          class="form-control"
+          [class.error]="getFieldError('aadharCardLink')"
+          placeholder="https://drive.google.com/file/d/..."
+        />
+        <div class="field-help">
+          <i class="fas fa-info-circle"></i>
+          Please upload your Aadhar Card to Google Drive and share the public link here
+        </div>
+        <div class="error-message" *ngIf="getFieldError('aadharCardLink')">
+          {{ getFieldError('aadharCardLink') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="candidateImageLink">Upload Candidate Image (Google Drive Link)</label>
+        <input
+          type="url"
+          id="candidateImageLink"
+          formControlName="candidateImageLink"
+          class="form-control"
+          [class.error]="getFieldError('candidateImageLink')"
+          placeholder="https://drive.google.com/file/d/..."
+        />
+        <div class="field-help">
+          <i class="fas fa-info-circle"></i>
+          Please upload your professional photo to Google Drive and share the public link here (Optional)
+        </div>
+        <div class="error-message" *ngIf="getFieldError('candidateImageLink')">
+          {{ getFieldError('candidateImageLink') }}
+        </div>
+      </div>
+
+      <div class="error-message general-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="success-message" *ngIf="successMessage">
+        <i class="fas fa-check-circle"></i>
+        {{ successMessage }}
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="goBack()"
+          [disabled]="isLoading"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading || candidateForm.invalid"
+        >
+          <span *ngIf="isLoading" class="spinner"></span>
+          {{ isLoading ? 'Submitting...' : 'Submit Nomination' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

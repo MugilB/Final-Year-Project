@@ -1,0 +1,223 @@
+<div class="voting-container">
+  <div class="voting-header">
+    <div class="header-top">
+      <button class="btn-outline" (click)="goBackToDashboard()">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </button>
+    </div>    
+  </div>
+
+  <!-- Election Card -->
+  <div class="election-card" *ngIf="selectedElection">
+    <div class="election-card-header">
+      <div class="election-title">
+        <h3>{{ selectedElection.name }}</h3>
+        <p class="eligibility-text">You are eligible to vote in this election</p>
+      </div>
+      <div class="election-status">
+        <span class="status-badge active">ACTIVE</span>
+      </div>
+    </div>
+    
+    <div class="election-details">
+      <div class="detail-row">
+        <span class="detail-label">Start Date:</span>
+        <span class="detail-value">{{ formatDate(selectedElection.startDate) }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">End Date:</span>
+        <span class="detail-value">{{ formatDate(selectedElection.endDate) }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Time Remaining:</span>
+        <span class="detail-value time-remaining">{{ getTimeRemaining(selectedElection.endDate) }}</span>
+      </div>
+    </div>
+    
+    <div class="election-description" *ngIf="selectedElection.description">
+      <p>{{ selectedElection.description }}</p>
+    </div>
+  </div>
+
+  <!-- Candidate Selection Section -->
+  <div class="candidate-selection-container" *ngIf="selectedElectionId">
+    <div class="selection-header">
+      <h2><i class="fas fa-vote-yea"></i> Select Candidate *</h2>
+      <span class="candidate-count">{{ candidates.length }} candidate{{ candidates.length !== 1 ? 's' : '' }}</span>
+    </div>
+    
+    <!-- Loading state for candidates -->
+    <div *ngIf="isLoading && selectedElectionId" class="loading-candidates">
+      <div class="spinner"></div>
+      <span>Loading candidates...</span>
+    </div>
+    
+    <!-- No candidates message -->
+    <div *ngIf="!isLoading && selectedElectionId && candidates.length === 0" class="no-candidates">
+      <i class="fas fa-info-circle"></i>
+      <span>No candidates available for this election.</span>
+    </div>
+    
+    <!-- Candidates Table -->
+    <div *ngIf="!isLoading && candidates.length > 0" class="candidates-table-container">
+      <!-- Desktop Table View -->
+      <div class="desktop-table">
+        <table class="candidates-table">
+          <thead>
+            <tr>
+              <th class="select-header">Select</th>
+              <th class="candidate-header">Candidate</th>
+              <th class="party-header">Party/Affiliation</th>
+              <th class="details-header">Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr 
+              *ngFor="let candidate of candidates; let i = index" 
+              [class.selected]="selectedCandidateId === candidate.candidateId"
+              (click)="selectCandidate(candidate.candidateId)"
+              class="candidate-row"
+              [style.animation-delay]="(i * 0.1) + 's'">
+              <td class="select-cell">
+                <div class="radio-container">
+                  <input 
+                    type="radio" 
+                    name="candidate" 
+                    [value]="candidate.candidateId"
+                    [checked]="selectedCandidateId === candidate.candidateId"
+                    (change)="selectCandidate(candidate.candidateId)"
+                    class="candidate-radio"
+                    [id]="'candidate-' + candidate.candidateId">
+                  <label [for]="'candidate-' + candidate.candidateId" class="radio-label"></label>
+                </div>
+              </td>
+              <td class="candidate-info">
+                <div class="candidate-avatar">
+                  <div class="avatar-placeholder">
+                    <i class="fas fa-user"></i>
+                  </div>
+                </div>
+                <div class="candidate-details">
+                  <div class="candidate-name">{{ candidate.name }}</div>
+                  <div class="candidate-id">ID: {{ candidate.candidateId }}</div>
+                </div>
+              </td>
+              <td class="party-info">
+                <div class="party-badge" [class.independent]="!candidate.partyId">
+                  <i class="fas fa-flag" *ngIf="candidate.partyId"></i>
+                  <i class="fas fa-user-tie" *ngIf="!candidate.partyId"></i>
+                  <span>{{ getPartyName(candidate.partyId) || 'Independent' }}</span>
+                </div>
+              </td>
+              <td class="action-cell">
+                <button 
+                  type="button" 
+                  class="btn-details"
+                  (click)="viewCandidateDetails(candidate, $event)"
+                  title="View candidate details">
+                  <i class="fas fa-info-circle"></i>
+                  <span>Details</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Card View -->
+      <div class="mobile-cards">
+        <div 
+          *ngFor="let candidate of candidates; let i = index"
+          class="candidate-card"
+          [class.selected]="selectedCandidateId === candidate.candidateId"
+          (click)="selectCandidate(candidate.candidateId)"
+          [style.animation-delay]="(i * 0.1) + 's'">
+          <div class="card-header">
+            <div class="candidate-avatar">
+              <div class="avatar-placeholder">
+                <i class="fas fa-user"></i>
+              </div>
+            </div>
+            <div class="candidate-info">
+              <div class="candidate-name">{{ candidate.name }}</div>
+              <div class="candidate-id">ID: {{ candidate.candidateId }}</div>
+            </div>
+            <div class="radio-container">
+              <input 
+                type="radio" 
+                name="candidate" 
+                [value]="candidate.candidateId"
+                [checked]="selectedCandidateId === candidate.candidateId"
+                (change)="selectCandidate(candidate.candidateId)"
+                class="candidate-radio"
+                [id]="'mobile-candidate-' + candidate.candidateId">
+              <label [for]="'mobile-candidate-' + candidate.candidateId" class="radio-label"></label>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="party-info">
+              <div class="party-badge" [class.independent]="!candidate.partyId">
+                <i class="fas fa-flag" *ngIf="candidate.partyId"></i>
+                <i class="fas fa-user-tie" *ngIf="!candidate.partyId"></i>
+                <span>{{ getPartyName(candidate.partyId) || 'Independent' }}</span>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              class="btn-details"
+              (click)="viewCandidateDetails(candidate, $event)"
+              title="View candidate details">
+              <i class="fas fa-info-circle"></i>
+              <span>View Details</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vote Summary -->
+    <div class="vote-summary" *ngIf="selectedCandidateId">
+      <h4>Vote Summary</h4>
+      <div class="summary-item">
+        <label>Selected Candidate:</label>
+        <span>{{ getSelectedCandidateName() }}</span>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-primary btn-vote"
+        (click)="submitVote()"
+        [disabled]="!selectedCandidateId || isLoading">
+        <i class="fas fa-vote-yea" *ngIf="!isLoading"></i>
+        <div class="spinner" *ngIf="isLoading"></div>
+        <span>{{ isLoading ? 'Submitting Vote...' : 'Submit Vote' }}</span>
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <div class="alert alert-error" *ngIf="error">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Success Message -->
+    <div class="alert alert-success" *ngIf="success">
+      <i class="fas fa-check-circle"></i>
+      <span>{{ success }}</span>
+    </div>
+  </div>
+
+  <!-- Security Notice -->
+  <div class="security-notice">
+    <h4><i class="fas fa-shield-alt"></i> Security Features</h4>
+    <ul>
+      <li><i class="fas fa-lock"></i> Your vote is encrypted using hybrid cryptography</li>
+      <li><i class="fas fa-eye-slash"></i> Vote data is hidden using steganography</li>
+      <li><i class="fas fa-link"></i> Stored securely in the blockchain</li>
+      <li><i class="fas fa-user-secret"></i> Your identity is protected</li>
+    </ul>
+  </div>
+</div>

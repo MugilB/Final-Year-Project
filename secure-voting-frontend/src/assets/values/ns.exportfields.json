@@ -1,0 +1,87 @@
+{
+    "tkt-export-ticket-fields":[
+        {
+            "01" : {"fieldName":"Ticket Number", "fieldValue":"{{ticket.number}}", "isChecked":false},
+            "02" : {"fieldName":"Subject", "fieldValue":"{{ticket.subject}}", "isChecked":false},
+            "03" : {"fieldName":"Description", "fieldValue":"{{ticket.desc}}", "isChecked":false},
+            "04" : {"fieldName":"Status", "fieldValue":"{{ticket.status}}", "isChecked":false},
+            "05" : {"fieldName":"Priority", "fieldValue":"{{ticket.priority}}", "isChecked":false},
+            "06" : {"fieldName":"Source", "fieldValue":"{{ticket.source}}", "isChecked":false},
+            "07" : {"fieldName":"Type", "fieldValue":"{{ticket.type}}", "isChecked":false},
+            "08" : {"fieldName":"Category", "fieldValue":"{{ticket.category}}", "isChecked":false},
+            "09" : {"fieldName":"Subcategory", "fieldValue":"{{ticket.subcategory}}", "isChecked":false},
+            "10" : {"fieldName":"Assign To", "fieldValue":"{{ticket.agent}}", "isChecked":false},
+            "11" : {"fieldName":"Group", "fieldValue":"{{ticket.group}}", "isChecked":false},
+            "12" : {"fieldName":"Created Time", "fieldValue":"{{ticket.createdTime}}", "isChecked":false},
+            "13" : {"fieldName":"Resolved Time", "fieldValue":"{{ticket.resolvedTime}}", "isChecked":false},
+            "14" : {"fieldName":"Closed Time", "fieldValue":"{{ticket.closedTime}}", "isChecked":false},
+            "15" : {"fieldName":"Closed By", "fieldValue":"{{ticket.closedBy}}", "isChecked":false},
+            "16" : {"fieldName":"Billable Time(mins)", "fieldValue":"{{ticket.billableTime}}", "isChecked":false},
+            "17" : {"fieldName":"Total Time(mins)", "fieldValue":"{{ticket.totalTime}}", "isChecked":false},
+            "18" : {"fieldName":"SLA", "fieldValue":"{{ticket.sla}}", "isChecked":false},
+            "19" : {"fieldName":"Due By", "fieldValue":"{{ticket.dueBy}}", "isChecked":false},
+            "20" : {"fieldName":"Updated Time", "fieldValue":"{{ticket.updatedTime}}", "isChecked":false},
+            "21" : {"fieldName":"Updated By", "fieldValue":"{{ticket.updatedBy}}", "isChecked":false},
+            "22" : {"fieldName":"First Replied Time", "fieldValue":"{{ticket.firstResponseTime}}", "isChecked":false},
+            "23" : {"fieldName":"First Assigned Time", "fieldValue":"{{ticket.firstAssignTime}}", "isChecked":false},
+            "24" : {"fieldName":"First Replied Duration(mins)", "fieldValue":"{{ticket.firstRepliedDuration}}", "isChecked":false},
+            "25" : {"fieldName":"First Assigned Duration(mins)", "fieldValue":"{{ticket.firstAssignedDuration}}", "isChecked":false},
+            "26" : {"fieldName":"Resolved Duration(mins)", "fieldValue":"{{ticket.resolvedDuration}}", "isChecked":false},
+            "27" : {"fieldName":"Closed Duration(mins)", "fieldValue":"{{ticket.closedDuration}}", "isChecked":false},
+            "28" : {"fieldName":"Number Of Conversations", "fieldValue":"{{ticket.numOfConv}}", "isChecked":false}
+        }
+    ],
+    "other-export-ticket-fields": [
+        {
+            "120" : {"fieldName":"Completed w/SLA", "fieldValue":"{{ticket.completedWithinSLA}}", "isChecked":false}
+        }
+    ],
+    "tkt-export-contact-fields":[
+        {
+            "30" : {"fieldName":"Name", "fieldValue":"{{contact.name}}", "isChecked":false},
+            "31" : {"fieldName":"Email", "fieldValue":"{{contact.email}}", "isChecked":false},
+            "32" : {"fieldName":"Work Phone", "fieldValue":"{{contact.workPhone}}", "isChecked":false},
+            "33" : {"fieldName":"Mobile Phone", "fieldValue":"{{contact.mobilePhone}}", "isChecked":false},
+            "34" : {"fieldName":"Company Name", "fieldValue":"{{contact.companyName}}", "isChecked":false},
+            "35" : {"fieldName":"Company Domains", "fieldValue":"{{contact.companyDomains}}", "isChecked":false}
+        }
+    ],
+    "export-contact-fields" :[
+        {
+            "50": {"fieldName": "Name", "fieldValue":"{{contact.name}}", "isChecked": false},
+            "51": {"fieldName": "Email", "fieldValue":"{{contact.email}}", "isChecked": false},
+            "52" : {"fieldName":"Secondary Emails", "fieldValue":"{{contact.secEmails}}", "isChecked":false},
+            "53": {"fieldName": "Title", "fieldValue":"{{contact.title}}", "isChecked": false},
+            "54": {"fieldName": "Work Phone", "fieldValue":"{{contact.workPhone}}", "isChecked": false},
+            "55": {"fieldName": "Mobile Phone", "fieldValue":"{{contact.mobilePhone}}", "isChecked": false},
+            "56": {"fieldName": "Company Name", "fieldValue":"{{contact.companyName}}", "isChecked": false},
+            "57": {"fieldName": "Company Domains", "fieldValue":"{{contact.companyDomains}}", "isChecked": false}
+        }
+    ],
+    "export-company-fields":[
+        {
+            "70": {"fieldName": "Company Name", "fieldValue":"{{company.name}}", "isChecked": false},
+            "71": {"fieldName": "Company Domains", "fieldValue":"{{company.companyDomains}}", "isChecked": false},
+            "72": {"fieldName": "Description", "fieldValue":"{{company.description}}", "isChecked": false},
+            "73": {"fieldName": "Address", "fieldValue":"{{company.address}}", "isChecked": false},
+            "74": {"fieldName": "City", "fieldValue":"{{company.city}}", "isChecked": false},
+            "75": {"fieldName": "State", "fieldValue":"{{company.state}}", "isChecked": false},
+            "76": {"fieldName": "Country", "fieldValue":"{{company.country}}", "isChecked": false},
+            "77": {"fieldName": "Zipcode", "fieldValue":"{{company.zipcode}}", "isChecked": false}
+        }
+    ],
+    "export-time-entries":[
+        {
+            "100": {"fieldName": "Time Entry ID", "fieldValue":"{{timeEntries.timeEntryId}}", "isChecked": false},
+            "101": {"fieldName": "Ticket Number", "fieldValue":"{{ticket.number}}", "isChecked": false},
+            "102": {"fieldName": "Ticket Subject", "fieldValue":"{{ticket.subject}}", "isChecked": false},
+            "103": {"fieldName": "Agent", "fieldValue":"{{timeEntries.agent}}", "isChecked": false},
+            "104": {"fieldName": "Note", "fieldValue":"{{timeEntries.note}}", "isChecked": false},
+            "105": {"fieldName": "Date", "fieldValue":"{{timeEntries.date}}", "isChecked": false},
+            "106": {"fieldName": "Start Time", "fieldValue":"{{timeEntries.startTime}}", "isChecked": false},
+            "107": {"fieldName": "Time Spent(mins)", "fieldValue":"{{timeEntries.timeSpent}}", "isChecked": false},
+            "108": {"fieldName": "Billable", "fieldValue":"{{timeEntries.billable}}", "isChecked": false},
+            "109": {"fieldName": "Additional Info", "fieldValue":"{{timeEntries.addtlInfo}}", "isChecked": false}
+        }
+    ]
+}

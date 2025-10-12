@@ -1,0 +1,71 @@
+{
+    "Ticket":[
+        {
+            "Subject" : "{{ticket.subject}}",
+            "Description" : "{{ticket.desc}}",
+            "Ticket URL - Agent Portal" : "{{ticket.agentUrl}}",
+            "Ticket URL - Support Portal" : "{{ticket.supportUrl}}",
+            "Assigned Agent Name" : "{{ticket.agentName}}",
+            "Assigned Agent Email" : "{{ticket.agentEmail}}",
+            "My Name" : "{{ticket.myName}}",
+            "My Email" : "{{ticket.myEmail}}",
+            "Priority" : "{{ticket.priority}}",
+            "Source" : "{{ticket.source}}",
+            "Status" : "{{ticket.status}}",
+            "Ticket ID" : "{{ticket.number}}",
+            "Type" : "{{ticket.type}}",
+            "Category" : "{{ticket.category}}",
+            "Subcategory" : "{{ticket.subcategory}}",
+            "Group" : "{{ticket.group}}",
+            "Replied Content" : "{{ticket.repliedContent}}",
+            "Last Updated On": "{{ticket.lastUpdatedOn}}",
+            "Watchers List": "{{ticket.watchersList}}",
+            "Share To List": "{{ticket.shareToList}}",
+            "Time Since Last Update": "{{ticket.timeSinceLastUpdate}}",
+            "Created On": "{{ticket.createdOn}}",
+            "Time Since Ticket Creation": "{{ticket.timeSinceCreation}}",
+            "Recent Ticket Conversations": "{{ticket.recentConversations}}"
+        }
+    ],
+    "Company":[
+        {
+            "Company Name" : "{{company.name}}",
+            "Company Domains" :"{{company.domains}}"
+        }
+    ],
+    "Contact":[
+        {
+            "Contact Name" : "{{contact.name}}",
+            "Contact Email" : "{{contact.email}}"
+
+        }
+    ],
+    "Helpdesk": [
+        {
+            "Helpdesk Name" : "{{helpdesk.name}}",
+            "Support Portal URL" : "{{helpdesk.supportUrl}}"
+        }
+    ],
+    "Approval": [
+        {
+            "Approval Subject": "{{approval.subject}}",
+            "Approval Description": "{{approval.description}}",
+            "Approval Status": "{{approval.status}}",
+            "Approval Type": "{{approval.type}}",
+            "Approval Action Performed User Name": "{{approval.actionPerformedByName}}",
+            "Approval Action Performed User Email": "{{approval.actionPerformedByEmail}}",
+            "Approver Note": "{{approver.note}}",
+            "Requestor Name": "{{requestor.name}}",
+            "Requestor Email": "{{requestor.email}}"
+        }
+    ],
+    "SLA": [
+        {
+            "Time Until Response Due": "{{ticket.timeUntilResponseDue}}",
+            "Time Until Resolve Due": "{{ticket.timeUntilResolveDue}}",
+            "Resolution Due Time": "{{ticket.resolutionDueTime}}",
+            "Response Due Time": "{{ticket.responseDueTime}}"
+        }
+
+    ]
+}

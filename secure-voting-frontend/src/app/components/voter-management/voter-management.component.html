@@ -1,0 +1,174 @@
+<div class="voter-management-container">
+  <div class="header">
+    <h2>Voter Management - Pending Approval</h2>
+  </div>
+
+  <div class="voters-table-container" *ngIf="!loading">
+    <table class="voters-table">
+      <thead>
+        <tr>
+          <th>Voter ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Ward</th>
+          <th>Status</th>
+          <th>Applied Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let voter of voters" class="voter-row">
+          <td>{{ voter.voterDetails?.voterId || 'N/A' }}</td>
+          <td>{{ getVoterFirstName(voter) }} {{ getVoterLastName(voter) }}</td>
+          <td>{{ getVoterEmail(voter) }}</td>
+          <td>{{ getWardName(voter.voterDetails?.wardId || 0) }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(voter.approvalStatus)">
+              {{ getStatusLabel(voter.approvalStatus) }}
+            </span>
+          </td>
+          <td>{{ formatDate(voter.createdAt) }}</td>
+          <td class="actions-cell">
+            <button class="btn btn-nomination" (click)="viewVoterDetails(voter)">
+              View Form
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading pending voters...</p>
+  </div>
+
+  <div class="no-voters" *ngIf="!loading && voters.length === 0">
+    <p>No pending voters found.</p>
+  </div>
+</div>
+
+<!-- Voter Details Modal -->
+<div class="modal-overlay" *ngIf="showVoterModal" (click)="closeVoterModal()">
+  <div class="nomination-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Voter Registration Details</h3>
+      <button class="close-btn" (click)="closeVoterModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-content" *ngIf="selectedVoter">
+      <div class="candidate-info">
+        <!-- Personal Information -->
+        <div class="info-section">
+          <h4>Personal Information</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Voter ID:</label>
+              <span>{{ selectedVoter.voterDetails?.voterId || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Username:</label>
+              <span>{{ selectedVoter.username }}</span>
+            </div>
+            <div class="info-item">
+              <label>First Name:</label>
+              <span>{{ getVoterFirstName(selectedVoter) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Last Name:</label>
+              <span>{{ getVoterLastName(selectedVoter) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Email:</label>
+              <span>{{ getVoterEmail(selectedVoter) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Phone Number:</label>
+              <span>{{ getVoterPhoneNumber(selectedVoter) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Gender:</label>
+              <span>{{ getVoterGender(selectedVoter) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Blood Group:</label>
+              <span>{{ getVoterBloodGroup(selectedVoter) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Date of Birth:</label>
+              <span>{{ formatDate(selectedVoter.voterDetails?.dob || 0) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Address:</label>
+              <span>{{ getVoterAddress(selectedVoter) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Ward:</label>
+              <span>{{ getWardName(selectedVoter.voterDetails?.wardId || 0) }}</span>
+            </div>
+            <div class="info-item" *ngIf="getVoterImageLink(selectedVoter) && getVoterImageLink(selectedVoter) !== 'N/A'">
+              <label>Profile Picture:</label>
+              <a [href]="getVoterImageLink(selectedVoter)" target="_blank" class="document-link">
+                <i class="fas fa-external-link-alt"></i>
+                View Profile Picture
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="info-section" *ngIf="getVoterAadharLink(selectedVoter) && getVoterAadharLink(selectedVoter) !== 'N/A'">
+          <h4>Documents</h4>
+          <div class="info-item">
+            <label>Proof (Aadhar Card):</label>
+            <a [href]="getVoterAadharLink(selectedVoter)" target="_blank" class="document-link">
+              <i class="fas fa-external-link-alt"></i>
+              View Aadhar Card
+            </a>
+          </div>
+        </div>
+
+        <!-- Registration Information -->
+        <div class="info-section">
+          <h4>Registration Information</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Status:</label>
+              <span>
+                <span class="status-badge" [ngClass]="getStatusClass(selectedVoter.approvalStatus)">
+                  {{ getStatusLabel(selectedVoter.approvalStatus) }}
+                </span>
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Applied Date:</label>
+              <span>{{ formatDate(selectedVoter.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeVoterModal()">
+        Close
+      </button>
+      <button 
+        class="btn btn-success" 
+        *ngIf="shouldShowApproveButton()"
+        (click)="approveVoter()">
+        <i class="fas fa-check"></i>
+        {{ getApproveButtonText() }}
+      </button>
+      <button 
+        class="btn btn-danger" 
+        *ngIf="shouldShowRejectButton()"
+        (click)="rejectVoter()">
+        <i class="fas fa-times"></i>
+        {{ getRejectButtonText() }}
+      </button>
+    </div>
+  </div>
+</div>

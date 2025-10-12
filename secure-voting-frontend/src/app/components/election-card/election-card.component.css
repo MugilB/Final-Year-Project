@@ -1,0 +1,242 @@
+.election-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border-left: 4px solid #e1e5e9;
+  position: relative;
+  overflow: hidden;
+}
+
+.election-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.election-card.eligible {
+  border-left-color: #28a745;
+  background: linear-gradient(135deg, #f8fff9 0%, #ffffff 100%);
+}
+
+.election-card.eligible:hover {
+  box-shadow: 0 8px 30px rgba(40, 167, 69, 0.2);
+}
+
+.election-card.voted {
+  border-left-color: #17a2b8;
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+}
+
+.election-card.ended {
+  border-left-color: #6c757d;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  opacity: 0.8;
+}
+
+.election-card.pending {
+  border-left-color: #ffc107;
+  background: linear-gradient(135deg, #fffbf0 0%, #ffffff 100%);
+}
+
+
+.election-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.election-description {
+  margin-bottom: 1rem;
+}
+
+.status-description {
+  color: #666;
+  font-size: 0.85rem;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.election-title {
+  color: #333;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+  line-height: 1.3;
+}
+
+.election-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  margin-left: 1rem;
+}
+
+.election-status.eligible {
+  background: #d4edda;
+  color: #155724;
+}
+
+.election-status.voted {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.election-status.ended {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.election-status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+
+.election-details {
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.time-remaining {
+  color: #28a745;
+  font-weight: 700;
+}
+
+.election-card.ended .time-remaining {
+  color: #6c757d;
+}
+
+.election-card.pending .time-remaining {
+  color: #ffc107;
+}
+
+.election-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .election-card {
+    padding: 1rem;
+  }
+  
+  .election-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .election-status {
+    margin-left: 0;
+    align-self: flex-start;
+  }
+  
+  .election-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .btn {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .detail-value {
+    text-align: left;
+  }
+}
+

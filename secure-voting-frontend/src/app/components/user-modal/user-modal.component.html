@@ -1,0 +1,424 @@
+<!-- User Modal Overlay -->
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="user-modal-card comprehensive-modal" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h3 class="modal-title">{{ modalTitle }}</h3>
+      <button class="close-button" (click)="closeModal()" [disabled]="isSubmitting">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Modal Content -->
+    <div class="modal-content">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Account Information Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="fas fa-user-cog"></i>
+            Account Information
+          </h4>
+          
+          <div class="form-row">
+            <!-- Voter ID Field -->
+            <div class="form-group">
+              <label for="username" class="form-label">
+                <i class="fas fa-id-card"></i>
+                Voter ID
+                <span class="optional-text" *ngIf="isEdit">(Optional)</span>
+              </label>
+              <input 
+                type="text" 
+                id="username" 
+                formControlName="username" 
+                class="form-input"
+                [class.error]="userForm.get('username')?.invalid && userForm.get('username')?.touched"
+                [placeholder]="isEdit ? 'Leave blank to keep current' : 'Enter voter ID'"
+                [disabled]="isSubmitting"
+              >
+              <div class="error-message" *ngIf="getFieldError('username')">
+                {{ getFieldError('username') }}
+              </div>
+            </div>
+
+            <!-- Email Field -->
+            <div class="form-group">
+              <label for="email" class="form-label">
+                <i class="fas fa-envelope"></i>
+                Email Address
+                <span class="optional-text" *ngIf="isEdit">(Optional)</span>
+              </label>
+              <input 
+                type="email" 
+                id="email" 
+                formControlName="email" 
+                class="form-input"
+                [class.error]="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+                [placeholder]="isEdit ? 'Leave blank to keep current' : 'Enter email address'"
+                [disabled]="isSubmitting"
+              >
+              <div class="error-message" *ngIf="getFieldError('email')">
+                {{ getFieldError('email') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- Password Field -->
+            <div class="form-group">
+              <label for="password" class="form-label">
+                <i class="fas fa-lock"></i>
+                Password
+                <span class="optional-text" *ngIf="isEdit">(Optional - leave blank to keep current)</span>
+              </label>
+              <input 
+                type="password" 
+                id="password" 
+                formControlName="password" 
+                class="form-input"
+                [class.error]="userForm.get('password')?.invalid && userForm.get('password')?.touched"
+                [placeholder]="isEdit ? 'Enter new password (optional)' : 'Enter password'"
+                [disabled]="isSubmitting"
+              >
+              <div class="error-message" *ngIf="getFieldError('password')">
+                {{ getFieldError('password') }}
+              </div>
+            </div>
+
+            <!-- Role Field -->
+            <div class="form-group">
+              <label for="role" class="form-label">
+                <i class="fas fa-user-tag"></i>
+                Role
+                <span class="optional-text" *ngIf="isEdit">(Optional)</span>
+              </label>
+              <select 
+                id="role" 
+                formControlName="role" 
+                class="form-select"
+                [class.error]="userForm.get('role')?.invalid && userForm.get('role')?.touched"
+                [disabled]="isSubmitting"
+              >
+                <option value="">Select Role</option>
+                <option value="USER">User</option>
+                <option value="ADMIN">Admin</option>
+                <option value="SYSTEM">System</option>
+              </select>
+              <div class="error-message" *ngIf="getFieldError('role')">
+                {{ getFieldError('role') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Approval Status Field (for editing) -->
+          <div class="form-group" *ngIf="isEdit">
+            <label for="approvalStatus" class="form-label">
+              <i class="fas fa-check-circle"></i>
+              Approval Status
+            </label>
+            <select 
+              id="approvalStatus" 
+              formControlName="approvalStatus" 
+              class="form-select"
+              [class.error]="userForm.get('approvalStatus')?.invalid && userForm.get('approvalStatus')?.touched"
+              [disabled]="isSubmitting"
+            >
+              <option value="2">Pending</option>
+              <option value="1">Approved</option>
+              <option value="0">Rejected</option>
+            </select>
+            <div class="error-message" *ngIf="getFieldError('approvalStatus')">
+              {{ getFieldError('approvalStatus') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="fas fa-user"></i>
+            Personal Information
+          </h4>
+          
+          <div class="form-row">
+            <!-- First Name Field -->
+            <div class="form-group">
+              <label for="firstName" class="form-label">
+                <i class="fas fa-user"></i>
+                First Name
+              </label>
+              <input 
+                type="text" 
+                id="firstName" 
+                formControlName="firstName" 
+                class="form-input"
+                [class.error]="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched"
+                placeholder="Enter first name"
+                [disabled]="isSubmitting"
+              >
+              <div class="error-message" *ngIf="getFieldError('firstName')">
+                {{ getFieldError('firstName') }}
+              </div>
+            </div>
+
+            <!-- Last Name Field -->
+            <div class="form-group">
+              <label for="lastName" class="form-label">
+                <i class="fas fa-user"></i>
+                Last Name
+              </label>
+              <input 
+                type="text" 
+                id="lastName" 
+                formControlName="lastName" 
+                class="form-input"
+                [class.error]="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched"
+                placeholder="Enter last name"
+                [disabled]="isSubmitting"
+              >
+              <div class="error-message" *ngIf="getFieldError('lastName')">
+                {{ getFieldError('lastName') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- Phone Number Field -->
+            <div class="form-group">
+              <label for="phoneNumber" class="form-label">
+                <i class="fas fa-phone"></i>
+                Phone Number
+              </label>
+              <input 
+                type="tel" 
+                id="phoneNumber" 
+                formControlName="phoneNumber" 
+                class="form-input"
+                [class.error]="userForm.get('phoneNumber')?.invalid && userForm.get('phoneNumber')?.touched"
+                placeholder="Enter phone number"
+                [disabled]="isSubmitting"
+              >
+              <div class="error-message" *ngIf="getFieldError('phoneNumber')">
+                {{ getFieldError('phoneNumber') }}
+              </div>
+            </div>
+
+            <!-- Date of Birth Field -->
+            <div class="form-group">
+              <label for="dateOfBirth" class="form-label">
+                <i class="fas fa-calendar"></i>
+                Date of Birth
+              </label>
+              <input 
+                type="date" 
+                id="dateOfBirth" 
+                formControlName="dateOfBirth" 
+                class="form-input"
+                [class.error]="userForm.get('dateOfBirth')?.invalid && userForm.get('dateOfBirth')?.touched"
+                [disabled]="isSubmitting"
+              >
+              <div class="error-message" *ngIf="getFieldError('dateOfBirth')">
+                {{ getFieldError('dateOfBirth') }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- Gender Field -->
+            <div class="form-group">
+              <label for="gender" class="form-label">
+                <i class="fas fa-venus-mars"></i>
+                Gender
+              </label>
+              <select 
+                id="gender" 
+                formControlName="gender" 
+                class="form-select"
+                [class.error]="userForm.get('gender')?.invalid && userForm.get('gender')?.touched"
+                [disabled]="isSubmitting"
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+              <div class="error-message" *ngIf="getFieldError('gender')">
+                {{ getFieldError('gender') }}
+              </div>
+            </div>
+
+            <!-- Blood Group Field -->
+            <div class="form-group">
+              <label for="bloodGroup" class="form-label">
+                <i class="fas fa-tint"></i>
+                Blood Group
+              </label>
+              <select 
+                id="bloodGroup" 
+                formControlName="bloodGroup" 
+                class="form-select"
+                [class.error]="userForm.get('bloodGroup')?.invalid && userForm.get('bloodGroup')?.touched"
+                [disabled]="isSubmitting"
+              >
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+              <div class="error-message" *ngIf="getFieldError('bloodGroup')">
+                {{ getFieldError('bloodGroup') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Field -->
+          <div class="form-group">
+            <label for="address" class="form-label">
+              <i class="fas fa-map-marker-alt"></i>
+              Address
+            </label>
+            <textarea 
+              id="address" 
+              formControlName="address" 
+              class="form-input textarea"
+              [class.error]="userForm.get('address')?.invalid && userForm.get('address')?.touched"
+              placeholder="Enter complete address"
+              rows="3"
+              [disabled]="isSubmitting"
+            ></textarea>
+            <div class="error-message" *ngIf="getFieldError('address')">
+              {{ getFieldError('address') }}
+            </div>
+          </div>
+
+          <!-- Ward Field -->
+          <div class="form-group">
+            <label for="wardId" class="form-label">
+              <i class="fas fa-building"></i>
+              Ward
+            </label>
+            <select 
+              id="wardId" 
+              formControlName="wardId" 
+              class="form-select"
+              [class.error]="userForm.get('wardId')?.invalid && userForm.get('wardId')?.touched"
+              [disabled]="isSubmitting"
+            >
+              <option value="">Select Ward</option>
+              <option *ngFor="let ward of wards" [value]="ward.wardId">
+                {{ ward.wardName }}
+              </option>
+            </select>
+            <div *ngIf="loadingWards" class="loading-text">
+              Loading wards...
+            </div>
+            <div class="error-message" *ngIf="getFieldError('wardId')">
+              {{ getFieldError('wardId') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Document Information Section -->
+        <div class="form-section">
+          <h4 class="section-title">
+            <i class="fas fa-file-alt"></i>
+            Document Information
+          </h4>
+          
+          <div class="form-row">
+            <!-- Aadhar Card Link Field -->
+            <div class="form-group">
+              <label for="aadharCardLink" class="form-label">
+                <i class="fas fa-id-card"></i>
+                Aadhar Card Link
+              </label>
+              <input 
+                type="url" 
+                id="aadharCardLink" 
+                formControlName="aadharCardLink" 
+                class="form-input"
+                [class.error]="userForm.get('aadharCardLink')?.invalid && userForm.get('aadharCardLink')?.touched"
+                placeholder="https://drive.google.com/file/d/..."
+                [disabled]="isSubmitting"
+              >
+              <div class="error-message" *ngIf="getFieldError('aadharCardLink')">
+                {{ getFieldError('aadharCardLink') }}
+              </div>
+            </div>
+
+            <!-- Profile Picture Link Field -->
+            <div class="form-group">
+              <label for="profilePictureLink" class="form-label">
+                <i class="fas fa-image"></i>
+                Profile Picture Link
+              </label>
+              <input 
+                type="url" 
+                id="profilePictureLink" 
+                formControlName="profilePictureLink" 
+                class="form-input"
+                [class.error]="userForm.get('profilePictureLink')?.invalid && userForm.get('profilePictureLink')?.touched"
+                placeholder="https://drive.google.com/file/d/..."
+                [disabled]="isSubmitting"
+              >
+              <div class="error-message" *ngIf="getFieldError('profilePictureLink')">
+                {{ getFieldError('profilePictureLink') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+          <div class="info-icon">ℹ️</div>
+          <div class="info-content">
+            <p class="info-text">
+              <strong *ngIf="!isEdit">Creating a new user:</strong>
+              <strong *ngIf="isEdit">Editing user:</strong>
+            </p>
+            <ul class="info-list">
+              <li *ngIf="!isEdit">Voter ID must be unique and at least 3 characters</li>
+              <li *ngIf="!isEdit">Password must be at least 6 characters</li>
+              <li *ngIf="isEdit">All fields are optional - leave blank to keep current values</li>
+              <li *ngIf="isEdit">Only fill in the fields you want to update</li>
+              <li>Email address will be used for notifications</li>
+              <li>Admin users have full system access</li>
+              <li>Document links must be valid Google Drive URLs</li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Modal Actions -->
+    <div class="modal-actions">
+      <button 
+        type="button"
+        class="btn btn-secondary" 
+        (click)="closeModal()"
+        [disabled]="isSubmitting"
+      >
+        <i class="fas fa-times"></i>
+        Cancel
+      </button>
+      <button 
+        type="button"
+        class="btn btn-primary" 
+        (click)="onSubmit()"
+        [disabled]="!isFormValid || isSubmitting"
+      >
+        <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+        <i class="fas fa-save" *ngIf="!isSubmitting"></i>
+        {{ isSubmitting ? 'Saving...' : (isEdit ? 'Update User' : 'Create User') }}
+      </button>
+    </div>
+  </div>
+</div>

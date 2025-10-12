@@ -1,0 +1,55 @@
+<div class="election-card" [class]="getStatusColor()">
+  <div class="election-header">
+    <h3 class="election-title">{{ election.name }}</h3>
+    <div class="election-status" [class]="getStatusColor()">
+      {{ getStatusText() }}
+    </div>
+  </div>
+
+  <div class="election-description">
+    <p class="status-description">{{ getStatusDescription() }}</p>
+  </div>
+
+  <div class="election-details">
+    <div class="detail-item">
+      <span class="detail-label">Start Date:</span>
+      <span class="detail-value">{{ formattedStartDate }}</span>
+    </div>
+    
+    <div class="detail-item">
+      <span class="detail-label">End Date:</span>
+      <span class="detail-value">{{ formattedEndDate }}</span>
+    </div>
+    
+    <div class="detail-item">
+      <span class="detail-label">Time Remaining:</span>
+      <span class="detail-value time-remaining">{{ timeRemaining }}</span>
+    </div>
+  </div>
+
+
+  <div class="election-actions">
+    <button 
+      class="btn btn-secondary" 
+      (click)="onViewDetails()"
+    >
+      View Details
+    </button>
+    
+    <button 
+      *ngIf="isEligible"
+      class="btn btn-primary" 
+      (click)="onVoteClick()"
+    >
+      Vote Now
+    </button>
+    
+    <button 
+      *ngIf="hasVoted"
+      class="btn btn-success" 
+      disabled
+    >
+      ✓ Voted
+    </button>
+  </div>
+</div>

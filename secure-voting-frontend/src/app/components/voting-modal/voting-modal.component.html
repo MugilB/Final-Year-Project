@@ -1,0 +1,117 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 class="modal-title">Cast Your Vote</h2>
+      <button class="close-button" (click)="closeModal()" type="button">
+        <span>&times;</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Election Information -->
+      <div class="election-info">
+        <h3 class="election-name">{{ election.name }}</h3>
+        <div class="election-details">
+          <div class="detail-row">
+            <span class="detail-label">Start Date:</span>
+            <span class="detail-value">{{ getFormattedDate(election.startDate) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">End Date:</span>
+            <span class="detail-value">{{ getFormattedDate(election.endDate) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-container" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading candidates...</p>
+      </div>
+
+      <!-- Error State -->
+      <div class="error-container" *ngIf="error && !isLoading">
+        <div class="error-icon">⚠️</div>
+        <p class="error-text">{{ error }}</p>
+        <button class="btn btn-secondary" (click)="loadCandidates()">Retry</button>
+      </div>
+
+      <!-- Candidates Table -->
+      <div class="candidates-section" *ngIf="!isLoading && !error && candidates.length > 0">
+        <h4 class="section-title">Select Your Candidate</h4>
+        <p class="section-subtitle">Choose the candidate you want to vote for:</p>
+        
+        <div class="candidates-table-container">
+          <table class="candidates-table">
+            <thead>
+              <tr>
+                <th class="select-column">Select</th>
+                <th class="name-column">Candidate Name</th>
+                <th class="party-column">Party ID</th>
+                <th class="ward-column">Ward ID</th>
+                <th class="avatar-column">Avatar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                *ngFor="let candidate of candidates; let i = index"
+                class="candidate-row"
+                [class.selected]="selectedCandidate?.candidateId === candidate.candidateId"
+                (click)="selectCandidate(candidate)"
+              >
+                <td class="select-cell">
+                  <div class="radio-button" [class.checked]="selectedCandidate?.candidateId === candidate.candidateId">
+                    <div class="radio-inner"></div>
+                  </div>
+                </td>
+                <td class="name-cell">
+                  <span class="candidate-name">{{ candidate.name }}</span>
+                </td>
+                <td class="party-cell">
+                  <span class="party-id">{{ candidate.partyId || 'N/A' }}</span>
+                </td>
+                <td class="ward-cell">
+                  <span class="ward-id">{{ candidate.wardId || 'N/A' }}</span>
+                </td>
+                <td class="avatar-cell">
+                  <div class="candidate-avatar">
+                    <span class="avatar-text">{{ candidate.name.charAt(0).toUpperCase() }}</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- No Candidates State -->
+      <div class="no-candidates" *ngIf="!isLoading && !error && candidates.length === 0">
+        <div class="no-candidates-icon">📋</div>
+        <h4>No Candidates Available</h4>
+        <p>There are no candidates registered for this election yet.</p>
+      </div>
+    </div>
+
+    <div class="modal-footer" *ngIf="!isLoading && !error">
+      <button 
+        class="btn btn-secondary" 
+        (click)="closeModal()"
+        [disabled]="isSubmitting"
+      >
+        Cancel
+      </button>
+      <button 
+        class="btn btn-primary" 
+        (click)="submitVote()"
+        [disabled]="!selectedCandidate || isSubmitting"
+        [class.loading]="isSubmitting"
+      >
+        <span *ngIf="!isSubmitting">Submit Vote</span>
+        <span *ngIf="isSubmitting" class="loading-content">
+          <div class="spinner-small"></div>
+          Submitting...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

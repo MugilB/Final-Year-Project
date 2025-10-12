@@ -1,0 +1,108 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ isEditMode ? 'Edit Candidate' : 'Add New Candidate' }}</h2>
+      <button class="close-btn" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="candidate-form">
+      <div class="form-group">
+        <label for="name">Candidate Name *</label>
+        <input 
+          type="text" 
+          id="name" 
+          [(ngModel)]="candidateForm.name" 
+          name="name"
+          placeholder="Enter candidate name"
+          required
+          [disabled]="isSubmitting">
+      </div>
+
+      <div class="form-group">
+        <label for="electionId">Election *</label>
+        <select 
+          id="electionId" 
+          [(ngModel)]="candidateForm.electionId" 
+          name="electionId"
+          required
+          [disabled]="isSubmitting">
+          <option value="">Select an election</option>
+          <option *ngFor="let election of elections" [value]="election.electionId">
+            {{ election.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="partyId">Party ID</label>
+          <input 
+            type="number" 
+            id="partyId" 
+            [(ngModel)]="candidateForm.partyId" 
+            name="partyId"
+            placeholder="Party ID (optional)"
+            [disabled]="isSubmitting">
+        </div>
+
+        <div class="form-group">
+          <label for="wardId">Ward ID</label>
+          <input 
+            type="number" 
+            id="wardId" 
+            [(ngModel)]="candidateForm.wardId" 
+            name="wardId"
+            placeholder="Ward ID (optional)"
+            [disabled]="isSubmitting">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="biography">Biography</label>
+        <textarea 
+          id="biography" 
+          [(ngModel)]="candidateForm.biography" 
+          name="biography"
+          placeholder="Enter candidate biography (optional)"
+          rows="4"
+          [disabled]="isSubmitting"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="manifestoSummary">Manifesto Summary</label>
+        <textarea 
+          id="manifestoSummary" 
+          [(ngModel)]="candidateForm.manifestoSummary" 
+          name="manifestoSummary"
+          placeholder="Enter manifesto summary (optional)"
+          rows="4"
+          [disabled]="isSubmitting"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+          <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update Candidate' : 'Add Candidate') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,39 @@
+{
+    "Ticket":[
+        {
+            "ticket.subject" : "Ticket Subject",
+            "ticket.desc" : "Description",
+            "ticket.agentUrl" : "Agent Portal Ticket URL",
+            "ticket.supportUrl" : "Support Portal Ticket URL",
+            "ticket.agentName" : "Assigned Agent Name",
+            "ticket.agentEmail" : "Assigned Agent Email",
+            "ticket.priority" : "Ticket Priority",
+            "ticket.source" : "Ticket Source",
+            "ticket.status" : "Ticket Status",
+            "ticket.number" : "Ticket ID",
+            "ticket.type": "Ticket Type",
+            "ticket.category": "Ticket Category",
+            "ticket.subcategory": "Ticket Subcategory",
+            "ticket.group": "Ticket Group",
+            "ticket.repliedContent": "Replied Content"
+        }
+    ],
+    "Contact":[
+        {
+            "contact.name" : "Contact Name",
+            "contact.email" : "Contact Email"
+        }
+    ],
+    "Company":[
+        {
+            "company.name" : "Company Name",
+            "company.domains" :"Company Domains"
+        }
+    ],
+    "Helpdesk": [
+        {
+            "helpdesk.name" : "Helpdesk Name",
+            "helpdesk.supportUrl" : "Support Portal URL"
+        }
+    ]
+}
