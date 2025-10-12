@@ -1,0 +1,27 @@
+{
+  "email": "voter@example.com",
+  "subject": "Voter Approved - John Doe",
+  "description": "Voter Registration Approved - The voter registration application for Voter ID: VOTER_123456 has been approved by admin.",
+  "status": "open",
+  "priority": 1,
+  "type": "Request",
+  "group": "Voter Registration",
+  "category": "New Registration",
+  "sub_category": "Voter Application",
+  "custom_fields": {
+    "cf_First Name": "John",
+    "cf_Last Name": "Doe",
+    "cf_Email": "voter@example.com",
+    "cf_Phone Number": "+1-555-123-4567",
+    "cf_Date Of Birth": "1990-05-15",
+    "cf_Gender": "Male",
+    "cf_Address": "123 Main Street, City, State 12345",
+    "cf_Ward": 1,
+    "cf_Blood Group": "O+",
+    "cf_Proof": "https://drive.google.com/file/d/example-aadhar-link",
+    "cf_Profile Picture": "https://drive.google.com/file/d/example-profile-link",
+    "cf_Action": "Voter Approved"
+  },
+  "watchers": [],
+  "share_to": []
+}

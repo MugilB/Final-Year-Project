@@ -1,0 +1,7 @@
+curl -X POST http://localhost:8081/api/auth/signin \
+  -H "Content-Type: application/json" \
+  -d @test_admin_login.json
+
+
+
+

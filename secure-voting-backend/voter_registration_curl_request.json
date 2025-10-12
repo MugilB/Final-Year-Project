@@ -1,0 +1,28 @@
+{
+  "email": "{{DYNAMIC_FROM_FORM}}",
+  "subject": "New Voter Registration Request - {{DYNAMIC_FIRST_NAME}} {{DYNAMIC_LAST_NAME}}",
+  "description": "New Voter Registration Request - Please review and approve the voter registration application for Voter ID: {{DYNAMIC_VOTER_ID}}",
+  "status": "open",
+  "priority": 1,
+  "type": "Request",
+  "group": "Voter Registration",
+  "category": "New Registration",
+  "sub_category": "Voter Application",
+  "custom_fields": {
+    "cf_First Name": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Last Name": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Email": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Phone Number": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Date Of Birth": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Gender": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Address": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Ward": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Blood Group": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Proof": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Profile Picture": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Username": "{{DYNAMIC_FROM_FORM}}",
+    "cf_Action": "New Voter Approval"
+  },
+  "watchers": [],
+  "share_to": []
+}

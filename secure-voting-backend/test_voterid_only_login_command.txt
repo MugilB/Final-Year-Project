@@ -1,0 +1,44 @@
+# Test VoterID-only login (after username column removal)
+curl -X POST http://localhost:8081/api/auth/test-voterid-login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voterId": "VOTER_1759900077221",
+    "password": "password123"
+  }'
+
+# Expected response:
+# {
+#   "success": true,
+#   "message": "VoterID login successful",
+#   "voterId": "VOTER_1759900077221",
+#   "email": "user@example.com",
+#   "approvalStatus": 1,
+#   "isEnabled": true,
+#   "roles": ["ROLE_USER"]
+# }
+
+# Test debug endpoint with VoterID
+curl -X POST http://localhost:8081/api/auth/debug-user \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voterId": "VOTER_1759900077221",
+    "testPassword": "password123"
+  }'
+
+# Expected response:
+# {
+#   "voterId": "VOTER_1759900077221",
+#   "email": "user@example.com",
+#   "role": "USER",
+#   "isActive": true,
+#   "approvalStatus": 1,
+#   "hashedPassword": "SET",
+#   "hashedPasswordLength": 60,
+#   "passwordMatches": true,
+#   "createdAt": 1759900077221,
+#   "lastLogin": 1759900077221
+# }
+
+
+
+

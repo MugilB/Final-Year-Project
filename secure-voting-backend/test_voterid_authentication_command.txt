@@ -1,0 +1,64 @@
+# Test VoterID Authentication After Migration
+# Make sure the backend is running first
+
+# Test 1: VoterID Login
+curl -X POST http://localhost:8081/api/auth/test-voterid-login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voterId": "VOTER_1759900077221",
+    "password": "password123"
+  }'
+
+# Expected response:
+# {
+#   "success": true,
+#   "message": "VoterID login successful",
+#   "voterId": "VOTER_1759900077221",
+#   "email": "user@example.com",
+#   "approvalStatus": 1,
+#   "isEnabled": true,
+#   "roles": ["ROLE_USER"]
+# }
+
+# Test 2: Debug User with VoterID
+curl -X POST http://localhost:8081/api/auth/debug-user \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voterId": "VOTER_1759900077221",
+    "testPassword": "password123"
+  }'
+
+# Expected response:
+# {
+#   "voterId": "VOTER_1759900077221",
+#   "email": "user@example.com",
+#   "role": "USER",
+#   "isActive": true,
+#   "approvalStatus": 1,
+#   "hashedPassword": "SET",
+#   "hashedPasswordLength": 60,
+#   "passwordMatches": true,
+#   "createdAt": 1759900077221,
+#   "lastLogin": 1759900077221
+# }
+
+# Test 3: Regular Signin (should work with VoterID)
+curl -X POST http://localhost:8081/api/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "VOTER_1759900077221",
+    "password": "password123"
+  }'
+
+# Expected response:
+# {
+#   "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+#   "tokenType": "Bearer",
+#   "username": "VOTER_1759900077221",
+#   "email": "user@example.com",
+#   "roles": ["ROLE_USER"]
+# }
+
+
+
+

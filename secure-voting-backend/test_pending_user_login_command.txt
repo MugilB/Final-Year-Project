@@ -1,0 +1,17 @@
+# Test pending user login (should fail after fix)
+curl -X POST http://localhost:8081/api/auth/test-voterid-login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voterId": "VOTER_1759900077221",
+    "password": "password123"
+  }'
+
+# Expected response after fix:
+# {
+#   "success": false,
+#   "error": "VoterID login failed: User account is disabled"
+# }
+
+
+
+
