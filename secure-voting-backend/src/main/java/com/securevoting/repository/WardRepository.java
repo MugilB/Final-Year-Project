@@ -17,3 +17,7 @@ public interface WardRepository extends JpaRepository<Ward, Integer> {
 
 
 
+
+
+
+

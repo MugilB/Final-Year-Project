@@ -104,6 +104,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/voters/*/status").hasRole("ADMIN")
                 .antMatchers("/api/debug/**").permitAll()
                 .antMatchers("/api/elections/*").authenticated()
+                .antMatchers("/api/users/me").authenticated() // Allow authenticated users to access their own profile
                 .antMatchers("/api/users/**").hasRole("ADMIN")
                 .anyRequest().authenticated();
 

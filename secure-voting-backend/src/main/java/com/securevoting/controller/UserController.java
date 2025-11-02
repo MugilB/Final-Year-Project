@@ -10,8 +10,11 @@ import com.securevoting.dto.UpdateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.securevoting.security.services.UserDetailsImpl;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -38,6 +41,96 @@ public class UserController {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @GetMapping("/me")
+    public ResponseEntity<Map<String, Object>> getCurrentUser() {
+        try {
+            System.out.println("=== /api/users/me endpoint called ===");
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                System.out.println("Authentication failed - not authenticated");
+                return ResponseEntity.status(401).build();
+            }
+
+            // Get voterId from authentication principal
+            Object principal = authentication.getPrincipal();
+            String voterId;
+            if (principal instanceof UserDetailsImpl) {
+                voterId = ((UserDetailsImpl) principal).getUsername(); // Username is voterId
+            } else if (principal instanceof String) {
+                voterId = (String) principal;
+            } else {
+                System.out.println("Authentication failed - invalid principal type");
+                return ResponseEntity.status(401).build();
+            }
+            
+            System.out.println("Authenticated voterId: " + voterId);
+
+            // Find user by voterId
+            Optional<User> userOpt = userRepository.findByVoterId(voterId);
+            if (userOpt.isEmpty()) {
+                System.out.println("User not found in database for voterId: " + voterId);
+                return ResponseEntity.notFound().build();
+            }
+
+            User user = userOpt.get();
+            System.out.println("Found User: " + user.getVoterId() + " - " + user.getEmail());
+            
+            Map<String, Object> userData = new HashMap<>();
+            
+            // Add basic user information
+            userData.put("voterId", user.getVoterId());
+            userData.put("email", user.getEmail());
+            userData.put("role", user.getRole());
+            userData.put("active", user.isActive());
+            userData.put("approvalStatus", user.getApprovalStatus());
+            userData.put("createdAt", user.getCreatedAt());
+            userData.put("lastLogin", user.getLastLogin());
+            
+            // Get user details
+            Optional<UserDetails> userDetailsOpt = userDetailsRepository.findByVoterId(voterId);
+            if (userDetailsOpt.isPresent()) {
+                UserDetails userDetails = userDetailsOpt.get();
+                String firstName = userDetails.getFirstName();
+                String lastName = userDetails.getLastName();
+                System.out.println("✅ Found UserDetails for " + voterId + ":");
+                System.out.println("   firstName=" + firstName + " (type: " + (firstName != null ? firstName.getClass().getSimpleName() : "null") + ")");
+                System.out.println("   lastName=" + lastName + " (type: " + (lastName != null ? lastName.getClass().getSimpleName() : "null") + ")");
+                
+                userData.put("firstName", firstName);
+                userData.put("lastName", lastName);
+                userData.put("phoneNumber", userDetails.getPhoneNumber());
+                userData.put("dateOfBirth", userDetails.getDob());
+                userData.put("gender", userDetails.getGender());
+                userData.put("address", userDetails.getAddress());
+                userData.put("wardId", userDetails.getWardId());
+                userData.put("bloodGroup", userDetails.getBloodGroup());
+                userData.put("aadharCardLink", userDetails.getAadharCardLink());
+                userData.put("profilePictureLink", userDetails.getProfilePictureLink());
+            } else {
+                // No user details found
+                System.out.println("⚠️ No UserDetails found for voterId: " + voterId);
+                System.out.println("⚠️ Setting firstName and lastName to null");
+                userData.put("firstName", null);
+                userData.put("lastName", null);
+                userData.put("phoneNumber", null);
+                userData.put("dateOfBirth", null);
+                userData.put("gender", null);
+                userData.put("address", null);
+                userData.put("wardId", null);
+                userData.put("bloodGroup", null);
+                userData.put("aadharCardLink", null);
+                userData.put("profilePictureLink", null);
+            }
+            
+            System.out.println("Returning userData with firstName=" + userData.get("firstName") + ", lastName=" + userData.get("lastName"));
+            return ResponseEntity.ok(userData);
+        } catch (Exception e) {
+            System.err.println("❌ Exception in /api/users/me:");
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")

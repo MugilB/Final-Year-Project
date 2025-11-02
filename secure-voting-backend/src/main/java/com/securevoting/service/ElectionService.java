@@ -58,12 +58,57 @@ public class ElectionService {
         return savedElection;
     }
 
+    /**
+     * Calculate and update election status based on current timestamp.
+     * Updates the status in database if it differs from the calculated status.
+     * 
+     * @param election The election to update
+     * @return The updated election with correct status
+     */
+    @Transactional
+    private Election calculateAndUpdateStatusIfNeeded(Election election) {
+        if (election == null) {
+            return null;
+        }
+        
+        long currentTime = System.currentTimeMillis();
+        String calculatedStatus;
+        
+        if (currentTime < election.getStartDate()) {
+            calculatedStatus = "SCHEDULED";
+        } else if (currentTime >= election.getStartDate() && currentTime <= election.getEndDate()) {
+            calculatedStatus = "OPENED";
+        } else {
+            calculatedStatus = "CLOSED";
+        }
+        
+        // Update status in database if it differs from calculated status
+        if (!calculatedStatus.equals(election.getStatus())) {
+            String oldStatus = election.getStatus();
+            election.setStatus(calculatedStatus);
+            election = electionRepository.save(election);
+            logger.info("Election '{}' status updated from {} to {} based on timestamp", 
+                       election.getName(), oldStatus, calculatedStatus);
+        }
+        
+        return election;
+    }
+
     public List<Election> getAllElections() {
-        return electionRepository.findAll();
+        List<Election> elections = electionRepository.findAll();
+        // Recalculate and update status for each election based on current timestamp
+        for (Election election : elections) {
+            calculateAndUpdateStatusIfNeeded(election);
+        }
+        return elections;
     }
 
     public List<ElectionWithDetailsResponse> getAllElectionsWithDetails() {
         List<Election> elections = electionRepository.findAll();
+        // Recalculate and update status for each election based on current timestamp
+        for (Election election : elections) {
+            calculateAndUpdateStatusIfNeeded(election);
+        }
         return elections.stream()
                 .map(election -> {
                     Optional<ElectionDetails> details = electionDetailsService.getElectionDetailsByElectionId(election.getElectionId());
@@ -83,6 +128,8 @@ public class ElectionService {
     public Election getElectionWithCandidates(int electionId) {
         Election election = electionRepository.findById(electionId).orElse(null);
         if (election != null) {
+            // Recalculate and update status based on current timestamp
+            election = calculateAndUpdateStatusIfNeeded(election);
             List<Candidate> candidates = candidateRepository.findByElectionId(electionId);
             election.setCandidates(candidates);
         }
@@ -93,6 +140,8 @@ public class ElectionService {
     public Election getElectionWithApprovedCandidates(int electionId) {
         Election election = electionRepository.findById(electionId).orElse(null);
         if (election != null) {
+            // Recalculate and update status based on current timestamp
+            election = calculateAndUpdateStatusIfNeeded(election);
             List<Candidate> approvedCandidates = candidateRepository.findByElectionIdAndStatus(electionId, CandidateStatus.APPROVED);
             election.setCandidates(approvedCandidates);
         }
@@ -103,6 +152,8 @@ public class ElectionService {
     public List<Election> getAllElectionsWithCandidates() {
         List<Election> elections = electionRepository.findAll();
         for (Election election : elections) {
+            // Recalculate and update status based on current timestamp
+            calculateAndUpdateStatusIfNeeded(election);
             List<Candidate> candidates = candidateRepository.findByElectionId(election.getElectionId());
             election.setCandidates(candidates);
         }
@@ -113,6 +164,8 @@ public class ElectionService {
     public List<Election> getAllElectionsWithApprovedCandidates() {
         List<Election> elections = electionRepository.findAll();
         for (Election election : elections) {
+            // Recalculate and update status based on current timestamp
+            calculateAndUpdateStatusIfNeeded(election);
             List<Candidate> approvedCandidates = candidateRepository.findByElectionIdAndStatus(election.getElectionId(), CandidateStatus.APPROVED);
             election.setCandidates(approvedCandidates);
         }
