@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { UserModalComponent } from '../user-modal/user-modal.component';
 import { CandidateManagementComponent } from '../candidate-management/candidate-management.component';
 import { VotingChartComponent } from '../voting-chart/voting-chart.component';
+import { VoterParticipationChartComponent } from '../voter-participation-chart/voter-participation-chart.component';
 import { VoterManagementComponent } from '../voter-management/voter-management.component';
 
 interface Election {
@@ -46,7 +47,7 @@ interface Activity {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatTooltipModule, UserModalComponent, CandidateManagementComponent, VotingChartComponent, VoterManagementComponent],
+  imports: [CommonModule, FormsModule, MatTooltipModule, UserModalComponent, CandidateManagementComponent, VotingChartComponent, VoterParticipationChartComponent, VoterManagementComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css'],
 })
@@ -242,26 +243,37 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   }
 
   getFilteredElections(): Election[] {
+    const now = Date.now();
     switch (this.selectedFilter) {
       case 'active':
-        return this.elections.filter(e => e.status === 'ACTIVE' || e.status === 'OPENED');
+        return this.elections.filter(e => {
+          // Filter based on timestamp
+          return now >= e.startDate && now <= e.endDate;
+        });
       case 'ended':
-        return this.elections.filter(e => e.status === 'ENDED' || e.status === 'CLOSED');
+        return this.elections.filter(e => {
+          // Filter based on timestamp
+          return now > e.endDate;
+        });
       case 'pending':
-        return this.elections.filter(e => e.status === 'PENDING' || e.status === 'SCHEDULED');
+        return this.elections.filter(e => {
+          // Filter based on timestamp
+          return now < e.startDate;
+        });
       default:
         return this.elections;
     }
   }
 
   getFilterCount(filter: string): number {
+    const now = Date.now();
     switch (filter) {
       case 'active':
-        return this.elections.filter(e => e.status === 'ACTIVE' || e.status === 'OPENED').length;
+        return this.elections.filter(e => now >= e.startDate && now <= e.endDate).length;
       case 'ended':
-        return this.elections.filter(e => e.status === 'ENDED' || e.status === 'CLOSED').length;
+        return this.elections.filter(e => now > e.endDate).length;
       case 'pending':
-        return this.elections.filter(e => e.status === 'PENDING' || e.status === 'SCHEDULED').length;
+        return this.elections.filter(e => now < e.startDate).length;
       default:
         return this.elections.length;
     }
@@ -281,6 +293,18 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
 
   getElectionStatus(election: Election): string {
     const now = Date.now();
+    
+    // Calculate status based on timestamp (not just from DB)
+    // This ensures we always show the real-time status
+    if (now > election.endDate) {
+      return 'ended';
+    } else if (now >= election.startDate && now <= election.endDate) {
+      return 'active';
+    } else if (now < election.startDate) {
+      return 'pending';
+    }
+    
+    // Fallback to DB status if timestamps are invalid
     if (election.status === 'ACTIVE' || election.status === 'OPENED') {
       return 'active';
     } else if (election.status === 'ENDED' || election.status === 'CLOSED') {

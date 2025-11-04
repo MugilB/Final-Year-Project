@@ -3,18 +3,32 @@
     <div class="header-content">
       <h1>Secure Voting Dashboard</h1>
       <div class="user-info">
-        <span>Welcome, {{ currentUser.username }}!</span>
-        <button class="btn btn-outline" (click)="refreshElections()" [disabled]="isLoading" title="Refresh Elections">
+        <span>Welcome, {{ getFullName() }}!</span>
+        <!-- <button class="btn btn-outline" (click)="refreshElections()" [disabled]="isLoading" title="Refresh Elections">
           <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
           {{ isLoading ? 'Refreshing...' : 'Refresh' }}
         </button>
         <button class="btn btn-success" (click)="goToVote()" style="margin-right: 10px;">
           <i class="fas fa-vote-yea"></i> Cast Vote
         </button>
-        <button class="btn btn-primary" *ngIf="isAdmin()" (click)="goToAdmin()">Admin Panel</button>
         <button class="btn btn-warning" (click)="goToAdmin()" style="margin-left: 10px;">Test Admin (Always Visible)</button>
-        <button class="btn btn-info" (click)="testNavigation()" style="margin-left: 10px;">Test Navigation</button>
-        <button class="btn btn-secondary" (click)="signOut()">Sign Out</button>
+        <button class="btn btn-info" (click)="testNavigation()" style="margin-left: 10px;">Test Navigation</button> -->
+        <button class="btn btn-primary" *ngIf="isAdmin()" (click)="goToAdmin()">Admin Panel</button>
+        <div class="profile-dropdown-container">
+          <button class="profile-icon-btn" (click)="toggleProfileMenu()" [class.active]="showProfileMenu">
+            <i class="fas fa-user-circle"></i>
+          </button>
+          <div class="profile-dropdown" *ngIf="showProfileMenu">
+            <button class="dropdown-item" (click)="openChangePasswordModal()">
+              <i class="fas fa-key"></i>
+              <span>Change Password</span>
+            </button>
+            <button class="dropdown-item" (click)="signOut()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Log Out</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -28,17 +42,21 @@
         <h3>Your Account Information</h3>
         <div class="info-grid">
           <div class="info-item">
-            <label>Username:</label>
-            <span>{{ currentUser.username }}</span>
+            <label>Name:</label>
+            <span>{{ getFullName() }}</span>
+          </div>
+          <div class="info-item" *ngIf="currentUser.voterId">
+            <label>Voter ID:</label>
+            <span>{{ currentUser.voterId }}</span>
           </div>
           <div class="info-item">
             <label>Email:</label>
             <span>{{ currentUser.email }}</span>
           </div>
-          <div class="info-item">
+          <!-- <div class="info-item">
             <label>Role:</label>
             <span>{{ currentUser.roles?.join(', ') || 'User' }}</span>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -46,10 +64,15 @@
     <div class="elections-section">
       <div class="elections-header">
         <h3>All Elections</h3>
-        <button class="btn btn-secondary" (click)="refreshElections()" [disabled]="isLoading">
-          <span *ngIf="isLoading" class="spinner"></span>
-          {{ isLoading ? 'Loading...' : 'Refresh' }}
+        <button class="btn btn-outline" (click)="refreshElections()" [disabled]="isLoading" title="Refresh Elections">
+          <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+          Refresh
         </button>
+
+        <!-- <button class="btn btn-outline" (click)="loadUsers()" [disabled]="isLoading" title="Refresh Users">
+            <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+            Refresh
+          </button> -->
       </div>
 
       <!-- Filter Tabs -->
@@ -123,4 +146,83 @@
       </div>
     </div>
   </main>
+
+  <!-- Change Password Modal -->
+  <div class="modal-overlay" *ngIf="showChangePasswordModal" (click)="closeChangePasswordModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Change Password</h3>
+        <button class="modal-close" (click)="closeChangePasswordModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePasswordSubmit()" class="change-password-form">
+        <div class="form-group">
+          <label for="newPassword">New Password *</label>
+          <div class="password-input-wrapper">
+            <input
+              [type]="showNewPassword ? 'text' : 'password'"
+              id="newPassword"
+              formControlName="newPassword"
+              class="form-control"
+              [class.error]="getPasswordFieldError('newPassword')"
+              placeholder="Enter your new password"
+            />
+            <button type="button" class="password-toggle-btn" (click)="toggleNewPasswordVisibility()">
+              <i class="fas" [class.fa-eye]="!showNewPassword" [class.fa-eye-slash]="showNewPassword"></i>
+            </button>
+          </div>
+          <div class="password-policy" *ngIf="changePasswordForm.get('newPassword')?.value">
+            <div class="policy-requirement" *ngFor="let policy of getPasswordPolicyStatus()">
+              <i class="fas" [class.fa-check-circle]="policy.met" [class.fa-times-circle]="!policy.met" 
+                 [class.requirement-met]="policy.met" [class.requirement-unmet]="!policy.met"></i>
+              <span [class.requirement-met]="policy.met" [class.requirement-unmet]="!policy.met">
+                {{ policy.requirement }}
+              </span>
+            </div>
+          </div>          
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password *</label>
+          <div class="password-input-wrapper">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              class="form-control"
+              [class.error]="getPasswordFieldError('confirmPassword')"
+              placeholder="Confirm your new password"
+              [disabled]="!isNewPasswordValid()"
+            />
+            <button type="button" class="password-toggle-btn" (click)="toggleConfirmPasswordVisibility()" [disabled]="!isNewPasswordValid()">
+              <i class="fas" [class.fa-eye]="!showConfirmPassword" [class.fa-eye-slash]="showConfirmPassword"></i>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="getPasswordFieldError('confirmPassword') && (changePasswordForm.get('confirmPassword')?.touched || changePasswordForm.get('confirmPassword')?.dirty)">
+            {{ getPasswordFieldError('confirmPassword') }}
+          </div>
+        </div>
+
+        <div class="error-message" *ngIf="passwordChangeErrorMessage">
+          {{ passwordChangeErrorMessage }}
+        </div>
+
+        <div class="success-message" *ngIf="passwordChangeSuccessMessage">
+          <i class="fas fa-check-circle"></i>
+          {{ passwordChangeSuccessMessage }}
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeChangePasswordModal()" [disabled]="isChangingPassword">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="isChangingPassword || changePasswordForm.invalid">
+            <span *ngIf="isChangingPassword" class="spinner"></span>
+            {{ isChangingPassword ? 'Changing...' : 'Change Password' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

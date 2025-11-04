@@ -26,10 +26,10 @@ export class VoterRegistrationComponent implements OnInit {
   ) {
     this.voterForm = this.formBuilder.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(1)]],
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', [Validators.required, Validators.pattern(/^[0-9+\-\s()]+$/)]],
-      dateOfBirth: ['', [Validators.required]],
+      dateOfBirth: ['', [Validators.required, this.ageValidator]],
       gender: ['', [Validators.required]],
       address: ['', [Validators.required, Validators.minLength(10)]],
       wardId: ['', [Validators.required]],
@@ -37,11 +37,41 @@ export class VoterRegistrationComponent implements OnInit {
       aadharCardLink: ['', [Validators.required, Validators.pattern(/^https:\/\/drive\.google\.com\/.*$/)]],
       profilePictureLink: ['', [Validators.pattern(/^https:\/\/drive\.google\.com\/.*$/)]]
     });
+
+    // Subscribe to dateOfBirth changes to trigger validation and show errors immediately
+    this.voterForm.get('dateOfBirth')?.valueChanges.subscribe(() => {
+      const dateOfBirthControl = this.voterForm.get('dateOfBirth');
+      if (dateOfBirthControl?.value) {
+        dateOfBirthControl.markAsTouched();
+        dateOfBirthControl.updateValueAndValidity();
+      }
+    });
   }
 
   ngOnInit(): void {
     this.loadWards();
   }
+
+  private ageValidator = (control: any): { [key: string]: any } | null => {
+    if (!control.value) {
+      return null;
+    }
+
+    const dateOfBirth = new Date(control.value);
+    const today = new Date();
+    let age = today.getFullYear() - dateOfBirth.getFullYear();
+    const monthDiff = today.getMonth() - dateOfBirth.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      return { ageInvalid: true };
+    }
+
+    return null;
+  };
 
   loadWards(): void {
     this.loadingWards = true;
@@ -139,7 +169,7 @@ export class VoterRegistrationComponent implements OnInit {
 
   getFieldError(fieldName: string): string {
     const field = this.voterForm.get(fieldName);
-    if (field?.errors && field.touched) {
+    if (field?.errors && (field.touched || field.dirty)) {
       if (field.errors['required']) {
         return `${this.getFieldDisplayName(fieldName)} is required`;
       }
@@ -148,6 +178,9 @@ export class VoterRegistrationComponent implements OnInit {
       }
       if (field.errors['email']) {
         return 'Please enter a valid email address';
+      }
+      if (field.errors['ageInvalid']) {
+        return 'You must be at least 18 years old to register as a voter';
       }
       if (field.errors['pattern']) {
         if (fieldName === 'phoneNumber') {

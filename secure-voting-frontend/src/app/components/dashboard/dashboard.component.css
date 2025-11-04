@@ -35,30 +35,15 @@
 }
 
 .btn-outline {
-  background: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  background: white;
+  color: #374151;
+  border: 1px solid #cbd5e1 !important;
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: #667eea;
-  color: white;
-  transform: translateY(-1px);
-}
-
-.btn-outline:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
+  background: #f9fafb;
+  border-color: #9ca3af !important;
+  color: #374151;
 }
 
 .fa-spin {
@@ -340,6 +325,311 @@
   transform: translateY(-1px);
 }
 
+/* Profile Dropdown Styles */
+.profile-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-icon-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.5rem;
+  padding: 0;
+}
+
+.profile-icon-btn:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.profile-icon-btn.active {
+  background: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: white;
+  color: #333;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+}
+
+.dropdown-item i {
+  width: 18px;
+  color: #667eea;
+}
+
+.dropdown-item:first-child {
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Change Password Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #f8f9fa;
+  color: #333;
+}
+
+.change-password-form {
+  padding: 1.5rem;
+}
+
+.change-password-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.change-password-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.change-password-form .form-control {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.change-password-form .form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.change-password-form .form-control.error {
+  border-color: #e74c3c;
+}
+
+.change-password-form .form-control:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover:not(:disabled) {
+  color: #667eea;
+}
+
+.password-toggle-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.password-toggle-btn i {
+  font-size: 0.9rem;
+}
+
+.change-password-form .error-message {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  text-align: left;
+  display: block;
+}
+
+/* Password Policy Requirements */
+.password-policy {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.policy-requirement {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.policy-requirement:last-child {
+  margin-bottom: 0;
+}
+
+.policy-requirement i {
+  font-size: 0.9rem;
+  width: 16px;
+}
+
+.policy-requirement .requirement-met {
+  color: #15803d;
+}
+
+.policy-requirement .requirement-unmet {
+  color: #666;
+}
+
+.policy-requirement i.requirement-met {
+  color: #15803d;
+}
+
+.policy-requirement i.requirement-unmet {
+  color: #dc2626;
+}
+
+.change-password-form .success-message {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: #15803d;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+  margin-top: 1.5rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .header-content {
@@ -368,5 +658,15 @@
 
   .feature-cards {
     grid-template-columns: 1fr;
+  }
+
+  .profile-dropdown {
+    right: auto;
+    left: 0;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 1rem;
   }
 }

@@ -29,8 +29,8 @@
           </td>
           <td>{{ formatDate(voter.createdAt) }}</td>
           <td class="actions-cell">
-            <button class="btn btn-nomination" (click)="viewVoterDetails(voter)">
-              View Form
+            <button class="btn btn-view-form" (click)="viewVoterDetails(voter)" title="View Application">
+              View Application <i class="fas fa-eye"></i>
             </button>
           </td>
         </tr>
@@ -67,10 +67,6 @@
             <div class="info-item">
               <label>Voter ID:</label>
               <span>{{ selectedVoter.voterDetails?.voterId || 'N/A' }}</span>
-            </div>
-            <div class="info-item">
-              <label>Username:</label>
-              <span>{{ selectedVoter.username }}</span>
             </div>
             <div class="info-item">
               <label>First Name:</label>

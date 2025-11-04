@@ -141,35 +141,88 @@
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-.btn-success {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+/* View Form Button with Eye Icon */
+.btn-view-form {
+  background: transparent;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: auto;
+  height: auto;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.btn-view-form:hover {
+  background: #3b82f6;
   color: white;
+  border-color: #3b82f6;
 }
 
-.btn-success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+.btn-view-form i {
+  font-size: 0.9rem;
 }
 
-.btn-danger {
-  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
-  color: white;
+/* Neon theme buttons for voter modal footer */
+.modal-footer .btn-success {
+  background: transparent;
+  border: 2px solid #22c55e;
+  color: #22c55e;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
-.btn-danger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+.modal-footer .btn-success:hover {
+  background: #22c55e;
+  color: #ffffff;
+  border-color: #22c55e;
 }
 
-.btn-secondary {
-  background: #6c757d;
-  color: white;
+.modal-footer .btn-success:active {
+  transform: scale(0.98);
 }
 
-.btn-secondary:hover {
-  background: #5a6268;
-  transform: translateY(-2px);
+.modal-footer .btn-danger {
+  background: transparent;
+  border: 2px solid #ef4444;
+  color: #ef4444;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
+
+.modal-footer .btn-danger:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+.modal-footer .btn-danger:active {
+  transform: scale(0.98);
+}
+
+.modal-footer .btn-secondary {
+  background: transparent;
+  border: 2px solid #6b7280;
+  color: #6b7280;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.modal-footer .btn-secondary:hover {
+  background: #6b7280;
+  color: #ffffff;
+  border-color: #6b7280;
+}
+
+.modal-footer .btn-secondary:active {
+  transform: scale(0.98);
+}
+
 
 .loading-container {
   display: flex;

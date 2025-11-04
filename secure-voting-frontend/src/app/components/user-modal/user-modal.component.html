@@ -16,7 +16,8 @@
       <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
         
         <!-- Account Information Section -->
-        <div class="form-section">
+        <!-- Commented out for edit mode - using *ngIf="false" to hide instead of HTML comments -->
+        <div class="form-section" *ngIf="false">
           <h4 class="section-title">
             <i class="fas fa-user-cog"></i>
             Account Information
@@ -377,7 +378,7 @@
         </div>
 
         <!-- Info Section -->
-        <div class="info-section">
+        <!-- <div class="info-section">
           <div class="info-icon">ℹ️</div>
           <div class="info-content">
             <p class="info-text">
@@ -394,7 +395,7 @@
               <li>Document links must be valid Google Drive URLs</li>
             </ul>
           </div>
-        </div>
+        </div> -->
       </form>
     </div>
     
@@ -412,6 +413,7 @@
       <button 
         type="button"
         class="btn btn-primary" 
+        [class.btn-update-user]="isEdit"
         (click)="onSubmit()"
         [disabled]="!isFormValid || isSubmitting"
       >

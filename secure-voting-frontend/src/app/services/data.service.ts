@@ -369,6 +369,12 @@ export class DataService {
 
   // --- User Management API Methods ---
   
+  getCurrentUser(): Observable<User> {
+    return this.http.get<User>(`${API_URL}/users/me`, { headers: this.getAuthHeaders() }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   getAllUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${API_URL}/users`, { headers: this.getAuthHeaders() }).pipe(
       catchError(this.handleError)

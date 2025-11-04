@@ -53,11 +53,6 @@
     </nav>
     
     <div class="sidebar-footer">
-      <div class="user-info">
-        <div class="user-avatar" matTooltip="{{ currentUser?.username }}" matTooltipPosition="right">
-          <i class="fas fa-user"></i>
-        </div>
-      </div>
       <button class="logout-btn" (click)="signOut()" matTooltip="Sign Out" matTooltipPosition="right">
         <i class="fas fa-sign-out-alt"></i>
       </button>
@@ -128,19 +123,7 @@
       <!-- Charts Section -->
       <div class="charts-grid">
         <div class="chart-card">
-          <div class="chart-header">
-            <h3>Election Activity</h3>
-            <div class="chart-controls">
-              <select class="chart-select">
-                <option>Last 7 days</option>
-                <option>Last 30 days</option>
-                <option>Last 3 months</option>
-              </select>
-            </div>
-          </div>
-          <div class="chart-container">
-            <canvas #electionChart></canvas>
-          </div>
+          <app-voter-participation-chart [elections]="elections"></app-voter-participation-chart>
         </div>
         
         <div class="chart-card">
@@ -351,7 +334,7 @@
     </section>
 
     <!-- Blockchain Section -->
-    <section class="content-section" *ngIf="activeSection === 'blockchain'">
+    <section class="content-section blockchain-section-wrapper" *ngIf="activeSection === 'blockchain'">
       <div class="section-header">
         <h1>Blockchain Explorer</h1>
         <div class="header-actions">
@@ -379,7 +362,8 @@
       </div>
       
       <!-- Blocks Table -->
-      <div class="table-container">
+      <div class="blockchain-table-wrapper">
+        <div class="table-container blockchain-table-container">
         <table class="data-table">
           <thead>
             <tr>
@@ -423,12 +407,6 @@
               <td>{{ block.nonce }}</td>
               <td>
                 <div class="action-buttons">
-                  <button class="btn btn-sm btn-outline" (click)="viewBlockDetails(block)" title="View Details">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline" (click)="viewBlockData(block)" title="View Data">
-                    <i class="fas fa-file-text"></i>
-                  </button>
                   <button *ngIf="block.voterId !== 'SYSTEM'" class="btn btn-sm btn-primary" (click)="viewVote(block)" title="View Vote">
                     <i class="fas fa-vote-yea"></i>
                   </button>
@@ -437,6 +415,7 @@
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
     </section>
 
@@ -729,62 +708,73 @@
 
 <!-- Vote Modal -->
 <div class="modal-overlay" *ngIf="showVoteModal" (click)="closeVoteModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Vote Details</h3>
-      <button class="modal-close" (click)="closeVoteModal()">
+  <div class="vote-modal-card" (click)="$event.stopPropagation()">
+    <div class="vote-card-header">
+      <h3 class="vote-card-title">Vote Details</h3>
+      <button class="vote-card-close" (click)="closeVoteModal()" title="Close">
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div class="modal-body">
+    
+    <div class="vote-card-body">
       <div *ngIf="isLoadingVote" class="loading-state">
         <div class="spinner"></div>
         <p>Decrypting vote data...</p>
       </div>
+      
       <div *ngIf="voteError" class="error-state">
         <i class="fas fa-exclamation-triangle"></i>
         <p>{{ voteError }}</p>
       </div>
-      <div *ngIf="decryptedVote && !isLoadingVote && !voteError" class="vote-details">
-        <div class="vote-info">
-          <div class="info-row">
-            <label>Block Height:</label>
-            <span>{{ selectedBlock?.blockHeight }}</span>
-          </div>
-          <div class="info-row">
-            <label>Voter ID:</label>
-            <span>{{ selectedBlock?.voterId }}</span>
-          </div>
-          <div class="info-row">
-            <label>Election:</label>
-            <span>{{ selectedBlock?.electionName }}</span>
-          </div>
-          <div class="info-row">
-            <label>Timestamp:</label>
-            <span>{{ getFormattedTimestamp(selectedBlock?.timestamp) }}</span>
+      
+      <div *ngIf="decryptedVote && !isLoadingVote && !voteError" class="vote-details-card">
+        <div class="vote-info-card">
+          <h4 class="vote-section-title">Block Information</h4>
+          <div class="vote-details-list">
+            <div class="vote-detail-item">
+              <span class="vote-detail-label">Block Height:</span>
+              <span class="vote-detail-value">{{ selectedBlock?.blockHeight }}</span>
+            </div>
+            <div class="vote-detail-item">
+              <span class="vote-detail-label">Voter ID:</span>
+              <span class="vote-detail-value">{{ selectedBlock?.voterId }}</span>
+            </div>
+            <div class="vote-detail-item">
+              <span class="vote-detail-label">Election:</span>
+              <span class="vote-detail-value">{{ selectedBlock?.electionName }}</span>
+            </div>
+            <div class="vote-detail-item">
+              <span class="vote-detail-label">Timestamp:</span>
+              <span class="vote-detail-value">{{ getFormattedTimestamp(selectedBlock?.timestamp) }}</span>
+            </div>
           </div>
         </div>
-        <div class="vote-data">
-          <h4>Vote Data:</h4>
-          <div class="vote-content">
-            <div class="vote-item">
-              <label>Selected Candidate:</label>
-              <span class="candidate-name">{{ decryptedVote.candidateName || 'N/A' }}</span>
+        
+        <div class="vote-data-card">
+          <h4 class="vote-section-title">Vote Data</h4>
+          <div class="vote-content-list">
+            <div class="vote-data-item">
+              <span class="vote-data-label">Selected Candidate:</span>
+              <span class="candidate-badge">{{ decryptedVote.candidateName || 'N/A' }}</span>
             </div>
-            <div class="vote-item">
-              <label>Vote Hash:</label>
-              <code class="vote-hash">{{ decryptedVote.voteHash || 'N/A' }}</code>
+            <!-- <div class="vote-data-item">
+              <span class="vote-data-label">Vote Hash:</span>
+              <code class="vote-hash-code">{{ decryptedVote.voteHash || 'N/A' }}</code>
             </div>
-            <div class="vote-item">
-              <label>Raw Vote Data:</label>
-              <pre class="raw-vote-data">{{ decryptedVote.rawData || 'N/A' }}</pre>
-            </div>
+            <div class="vote-data-item">
+              <span class="vote-data-label">Raw Vote Data:</span>
+              <pre class="vote-raw-data">{{ decryptedVote.rawData || 'N/A' }}</pre>
+            </div> -->
           </div>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" (click)="closeVoteModal()">Close</button>
+    
+    <div class="vote-card-footer">
+      <button class="btn btn-secondary" (click)="closeVoteModal()">
+        <i class="fas fa-times"></i>
+        Close
+      </button>
     </div>
   </div>
 </div>

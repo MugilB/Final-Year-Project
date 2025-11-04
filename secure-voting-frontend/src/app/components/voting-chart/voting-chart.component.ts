@@ -1,9 +1,11 @@
-import { Component, OnInit, OnChanges, Input, ViewChild, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, ViewChild, SimpleChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChartConfiguration, ChartData, ChartType, registerables } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { DataService, Election, Candidate } from '../../services/data.service';
+import { NotificationService } from '../../services/notification.service';
+import { Subscription } from 'rxjs';
 import Chart from 'chart.js/auto';
 
 @Component({
@@ -13,7 +15,7 @@ import Chart from 'chart.js/auto';
   templateUrl: './voting-chart.component.html',
   styleUrl: './voting-chart.component.css'
 })
-export class VotingChartComponent implements OnInit, OnChanges {
+export class VotingChartComponent implements OnInit, OnChanges, OnDestroy {
   @Input() elections: Election[] = [];
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   
@@ -21,6 +23,8 @@ export class VotingChartComponent implements OnInit, OnChanges {
   candidates: Candidate[] = [];
   isLoading = false;
   error: string | null = null;
+  private filterSubscription?: Subscription;
+  private isInternalChange = false;
 
   // Chart configuration
   public barChartOptions: ChartConfiguration['options'] = {
@@ -95,7 +99,10 @@ export class VotingChartComponent implements OnInit, OnChanges {
     ]
   };
 
-  constructor(private dataService: DataService) {
+  constructor(
+    private dataService: DataService,
+    private notificationService: NotificationService
+  ) {
     // Register Chart.js components
     Chart.register(...registerables);
   }
@@ -104,10 +111,24 @@ export class VotingChartComponent implements OnInit, OnChanges {
     console.log('VotingChartComponent ngOnInit called');
     console.log('Available elections:', this.elections);
     
+    // Subscribe to chart filter changes from other charts
+    this.filterSubscription = this.notificationService.chartFilterChanged$.subscribe(
+      (electionId: string | null) => {
+        if (!this.isInternalChange && this.selectedElectionId !== electionId) {
+          console.log('VotingChart: Filter changed from external source:', electionId);
+          this.selectedElectionId = electionId;
+          this.loadRealChartData();
+        }
+        this.isInternalChange = false;
+      }
+    );
+    
     // Set default election selection if elections are available
     if (this.elections && this.elections.length > 0) {
       this.selectedElectionId = this.elections[0].electionId.toString();
       this.loadRealChartData();
+      // Notify other charts about the initial selection
+      this.notificationService.notifyChartFilterChanged(this.selectedElectionId);
     } else {
       console.log('No elections available yet, waiting for input...');
     }
@@ -119,12 +140,23 @@ export class VotingChartComponent implements OnInit, OnChanges {
       if (this.elections && this.elections.length > 0 && !this.selectedElectionId) {
         this.selectedElectionId = this.elections[0].electionId.toString();
         this.loadRealChartData();
+        // Notify other charts about the initial selection
+        this.notificationService.notifyChartFilterChanged(this.selectedElectionId);
       }
     }
   }
 
   onElectionChange() {
+    this.isInternalChange = true;
+    // Notify other charts about the filter change
+    this.notificationService.notifyChartFilterChanged(this.selectedElectionId);
     this.loadRealChartData();
+  }
+  
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
   }
 
   private loadRealChartData() {

@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { DataService, Election, Candidate } from '../../services/data.service';
 import { NotificationService } from '../../services/notification.service';
@@ -11,25 +12,63 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ElectionCardComponent],
+  imports: [CommonModule, ElectionCardComponent, ReactiveFormsModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: any = {};
+  userFullName: string = '';
   allElections: Election[] = [];
   isLoading = false;
   errorMessage = '';
   selectedFilter: string = 'all'; // 'all', 'eligible', 'voted', 'ended', 'pending'
   userVotingStatus: Map<number, boolean> = new Map(); // Cache for voting status
   private routerSubscription: Subscription = new Subscription();
+  showProfileMenu = false;
+  showChangePasswordModal = false;
+  changePasswordForm: FormGroup;
+  isChangingPassword = false;
+  passwordChangeErrorMessage = '';
+  passwordChangeSuccessMessage = '';
+  showNewPassword = false;
+  showConfirmPassword = false;
 
   constructor(
     private authService: AuthService,
     private dataService: DataService,
     private notificationService: NotificationService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private formBuilder: FormBuilder
+  ) {
+    this.changePasswordForm = this.formBuilder.group({
+      newPassword: ['', [Validators.required, Validators.minLength(8), this.passwordPolicyValidator]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
+
+    // Subscribe to password changes for real-time validation feedback
+    this.changePasswordForm.get('newPassword')?.valueChanges.subscribe(() => {
+      this.changePasswordForm.get('newPassword')?.updateValueAndValidity();
+      this.changePasswordForm.get('confirmPassword')?.updateValueAndValidity();
+      
+      // Enable/disable confirm password based on new password validity
+      const newPasswordControl = this.changePasswordForm.get('newPassword');
+      const confirmPasswordControl = this.changePasswordForm.get('confirmPassword');
+      
+      if (newPasswordControl && confirmPasswordControl) {
+        if (newPasswordControl.valid) {
+          confirmPasswordControl.enable();
+        } else {
+          confirmPasswordControl.disable();
+          confirmPasswordControl.setValue('');
+        }
+      }
+    });
+    
+    // Initially disable confirm password field
+    this.changePasswordForm.get('confirmPassword')?.disable();
+  }
 
   ngOnInit(): void {
     console.log('=== DashboardComponent ngOnInit() called ===');
@@ -47,6 +86,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Get current user data
     this.currentUser = this.authService.getUser();
     console.log('Current user:', this.currentUser);
+    
+    // Load user details to get firstName and lastName
+    this.loadUserDetails();
     
     // Load elections
     console.log('Loading elections...');
@@ -76,6 +118,122 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Clean up subscription
     this.routerSubscription.unsubscribe();
+  }
+
+  loadUserDetails(): void {
+    console.log('=== loadUserDetails() called ===');
+    const voterId = this.currentUser?.username || this.currentUser?.voterId;
+    console.log('Current voterId:', voterId);
+    
+    // Use the new /users/me endpoint to get current user's details with firstName/lastName
+    this.dataService.getCurrentUser().subscribe({
+      next: (user: any) => {
+        console.log('=== SUCCESS: Got current user details from API ===');
+        console.log('Full response:', JSON.stringify(user, null, 2));
+        console.log('firstName type:', typeof user.firstName, 'value:', user.firstName);
+        console.log('lastName type:', typeof user.lastName, 'value:', user.lastName);
+        
+        // Update currentUser with full details
+        this.currentUser = { ...this.currentUser, ...user };
+        
+        // Handle null/undefined values properly
+        const firstName = user.firstName || '';
+        const lastName = user.lastName || '';
+        
+        console.log('Processed firstName:', firstName, 'is empty?', firstName.trim() === '');
+        console.log('Processed lastName:', lastName, 'is empty?', lastName.trim() === '');
+        
+        // Build full name from firstName and lastName
+        if (firstName && lastName && firstName.trim() !== '' && lastName.trim() !== '') {
+          this.userFullName = `${firstName.trim()} ${lastName.trim()}`;
+          console.log('✅✅✅ Set userFullName from firstName + lastName:', this.userFullName);
+          this.cdr.detectChanges(); // Force change detection
+        } else if (firstName && firstName.trim() !== '') {
+          this.userFullName = firstName.trim();
+          console.log('✅✅✅ Set userFullName from firstName only:', this.userFullName);
+          this.cdr.detectChanges(); // Force change detection
+        } else if (lastName && lastName.trim() !== '') {
+          this.userFullName = lastName.trim();
+          console.log('✅✅✅ Set userFullName from lastName only:', this.userFullName);
+          this.cdr.detectChanges(); // Force change detection
+        } else {
+          // If firstName and lastName are null/empty, keep using voterId as fallback
+          this.userFullName = this.currentUser?.username || this.currentUser?.voterId || 'User';
+          console.warn('⚠️⚠️⚠️ firstName and lastName are null/empty in database!');
+          console.warn('⚠️ Using voterId as fallback:', this.userFullName);
+          console.warn('⚠️ Please update the user_details table with firstName and lastName for voterId:', voterId);
+          this.cdr.detectChanges();
+        }
+      },
+      error: (error: any) => {
+        console.error('=== ERROR: Loading current user details failed ===');
+        console.error('Full error object:', error);
+        console.error('Error status:', error?.status);
+        console.error('Error message:', error?.message);
+        console.error('Error URL:', error?.url);
+        
+        // Fallback: check if currentUser already has firstName/lastName
+        if (this.currentUser?.firstName && this.currentUser?.lastName &&
+            this.currentUser.firstName.trim() !== '' && this.currentUser.lastName.trim() !== '') {
+          this.userFullName = `${this.currentUser.firstName} ${this.currentUser.lastName}`.trim();
+          console.log('Using firstName/lastName from currentUser (fallback):', this.userFullName);
+        } else if (this.currentUser?.firstName && this.currentUser.firstName.trim() !== '') {
+          this.userFullName = this.currentUser.firstName.trim();
+          console.log('Using firstName from currentUser (fallback):', this.userFullName);
+        } else if (this.currentUser?.lastName && this.currentUser.lastName.trim() !== '') {
+          this.userFullName = this.currentUser.lastName.trim();
+          console.log('Using lastName from currentUser (fallback):', this.userFullName);
+        } else {
+          this.userFullName = this.currentUser?.username || this.currentUser?.voterId || 'User';
+          console.warn('Using voterId/username (final fallback):', this.userFullName);
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  getFullName(): string {
+    // Priority 1: Check if we've already loaded a valid full name (not voterId)
+    if (this.userFullName && 
+        this.userFullName.trim() !== '' && 
+        this.userFullName !== this.currentUser?.username && 
+        this.userFullName !== this.currentUser?.voterId &&
+        !this.userFullName.startsWith('VOTER_') &&
+        !this.userFullName.match(/^VOTER_\d+$/)) {
+      return this.userFullName;
+    }
+    
+    // Priority 2: Check if currentUser has firstName/lastName directly (from API response)
+    if (this.currentUser?.firstName && this.currentUser?.lastName) {
+      const firstNameTrimmed = (this.currentUser.firstName || '').trim();
+      const lastNameTrimmed = (this.currentUser.lastName || '').trim();
+      if (firstNameTrimmed !== '' && lastNameTrimmed !== '') {
+        const fullName = `${firstNameTrimmed} ${lastNameTrimmed}`;
+        this.userFullName = fullName;
+        return fullName;
+      }
+    }
+    
+    // Priority 3: Check if we have just firstName
+    if (this.currentUser?.firstName) {
+      const firstNameTrimmed = (this.currentUser.firstName || '').trim();
+      if (firstNameTrimmed !== '' && !firstNameTrimmed.startsWith('VOTER_')) {
+        this.userFullName = firstNameTrimmed;
+        return firstNameTrimmed;
+      }
+    }
+    
+    // Priority 4: Check if we have just lastName
+    if (this.currentUser?.lastName) {
+      const lastNameTrimmed = (this.currentUser.lastName || '').trim();
+      if (lastNameTrimmed !== '' && !lastNameTrimmed.startsWith('VOTER_')) {
+        this.userFullName = lastNameTrimmed;
+        return lastNameTrimmed;
+      }
+    }
+    
+    // Final fallback - use voterId/username only if we really don't have a name
+    return this.currentUser?.username || this.currentUser?.voterId || 'User';
   }
 
   loadElections(): void {
@@ -326,6 +484,193 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     }).catch(error => {
       console.error('❌ Test navigation error:', error);
+    });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.profile-dropdown-container')) {
+      this.closeProfileMenu();
+    }
+  }
+
+  toggleProfileMenu(): void {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  closeProfileMenu(): void {
+    this.showProfileMenu = false;
+  }
+
+  openChangePasswordModal(): void {
+    this.showChangePasswordModal = true;
+    this.showProfileMenu = false;
+    this.passwordChangeErrorMessage = '';
+    this.passwordChangeSuccessMessage = '';
+    this.showNewPassword = false;
+    this.showConfirmPassword = false;
+    this.changePasswordForm.reset();
+    // Disable confirm password initially
+    this.changePasswordForm.get('confirmPassword')?.disable();
+  }
+
+  closeChangePasswordModal(): void {
+    this.showChangePasswordModal = false;
+    this.passwordChangeErrorMessage = '';
+    this.passwordChangeSuccessMessage = '';
+    this.showNewPassword = false;
+    this.showConfirmPassword = false;
+    this.changePasswordForm.reset();
+    // Disable confirm password when closing
+    this.changePasswordForm.get('confirmPassword')?.disable();
+  }
+
+  toggleNewPasswordVisibility(): void {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  isNewPasswordValid(): boolean {
+    const newPasswordControl = this.changePasswordForm.get('newPassword');
+    return newPasswordControl ? newPasswordControl.valid : false;
+  }
+
+  private passwordPolicyValidator = (control: any): { [key: string]: any } | null => {
+    if (!control.value) {
+      return null;
+    }
+
+    const password = control.value;
+    const errors: any = {};
+
+    if (password.length < 8) {
+      errors['minLength'] = true;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      errors['noUppercase'] = true;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      errors['noLowercase'] = true;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      errors['noDigit'] = true;
+    }
+
+    return Object.keys(errors).length > 0 ? errors : null;
+  };
+
+  private passwordMatchValidator = (group: FormGroup): { [key: string]: any } | null => {
+    const newPassword = group.get('newPassword');
+    const confirmPassword = group.get('confirmPassword');
+    
+    if (!newPassword || !confirmPassword) {
+      return null;
+    }
+    
+    if (newPassword.value && confirmPassword.value && newPassword.value !== confirmPassword.value) {
+      return { passwordMismatch: true };
+    }
+    
+    return null;
+  };
+
+  getPasswordPolicyStatus(): { requirement: string; met: boolean }[] {
+    const password = this.changePasswordForm.get('newPassword')?.value || '';
+
+    return [
+      {
+        requirement: 'At least 8 characters',
+        met: password.length >= 8
+      },
+      {
+        requirement: 'At least one uppercase letter',
+        met: /[A-Z]/.test(password)
+      },
+      {
+        requirement: 'At least one lowercase letter',
+        met: /[a-z]/.test(password)
+      },
+      {
+        requirement: 'At least one digit',
+        met: /[0-9]/.test(password)
+      }
+    ];
+  }
+
+  getPasswordFieldError(fieldName: string): string {
+    const field = this.changePasswordForm.get(fieldName);
+    if (field?.errors && (field.touched || field.dirty)) {
+      if (field.errors['required']) {
+        return fieldName === 'newPassword' ? 'New Password is required' : 'Confirm Password is required';
+      }
+      if (field.errors['minlength'] || field.errors['minLength']) {
+        return 'Password must be at least 8 characters';
+      }
+    }
+    
+    // Check for password mismatch error on the form group
+    if (fieldName === 'confirmPassword' && this.changePasswordForm.errors?.['passwordMismatch'] && field?.touched) {
+      return 'Passwords do not match';
+    }
+    
+    return '';
+  }
+
+  onChangePasswordSubmit(): void {
+    if (this.changePasswordForm.valid) {
+      this.isChangingPassword = true;
+      this.passwordChangeErrorMessage = '';
+      this.passwordChangeSuccessMessage = '';
+
+      const newPassword = this.changePasswordForm.get('newPassword')?.value;
+      const voterId = this.currentUser?.username || this.currentUser?.voterId;
+
+      if (!voterId) {
+        this.passwordChangeErrorMessage = 'Unable to identify user. Please try again.';
+        this.isChangingPassword = false;
+        return;
+      }
+
+      this.authService.changePassword(voterId, newPassword).subscribe({
+        next: (response: any) => {
+          this.isChangingPassword = false;
+          this.passwordChangeSuccessMessage = response.message || 'Password changed successfully!';
+          this.changePasswordForm.reset();
+          
+          // Close modal after 2 seconds
+          setTimeout(() => {
+            this.closeChangePasswordModal();
+          }, 2000);
+        },
+        error: (error) => {
+          this.isChangingPassword = false;
+          console.error('Error changing password:', error);
+          
+          if (error.error?.error) {
+            this.passwordChangeErrorMessage = error.error.error;
+          } else if (error.error?.message) {
+            this.passwordChangeErrorMessage = error.error.message;
+          } else {
+            this.passwordChangeErrorMessage = 'Failed to change password. Please try again later.';
+          }
+        }
+      });
+    } else {
+      this.markPasswordFormGroupTouched();
+    }
+  }
+
+  private markPasswordFormGroupTouched(): void {
+    Object.keys(this.changePasswordForm.controls).forEach(key => {
+      const control = this.changePasswordForm.get(key);
+      control?.markAsTouched();
     });
   }
 }

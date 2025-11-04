@@ -68,44 +68,47 @@ export class ElectionCardComponent implements OnInit, OnChanges {
   }
 
   getStatusColor(): string {
+    const now = Date.now();
     if (this.hasVoted) {
       return 'voted';
     } else if (this.isEligible) {
       return 'eligible';
-    } else if ((this.election.status === 'ACTIVE' || this.election.status === 'OPENED') && this.election.endDate <= Date.now()) {
+    } else if (now > this.election.endDate) {
       return 'ended';
-    } else if (this.election.status === 'PENDING' || this.election.startDate > Date.now()) {
+    } else if (now < this.election.startDate) {
       return 'pending';
     } else {
-      return 'ended';
+      return 'eligible';
     }
   }
 
   getStatusText(): string {
+    const now = Date.now();
     if (this.hasVoted) {
       return '✓ Voted';
     } else if (this.isEligible) {
       return 'Vote Now';
-    } else if ((this.election.status === 'ACTIVE' || this.election.status === 'OPENED') && this.election.endDate <= Date.now()) {
+    } else if (now > this.election.endDate) {
       return 'Ended';
-    } else if (this.election.status === 'PENDING' || this.election.startDate > Date.now()) {
+    } else if (now < this.election.startDate) {
       return 'Not Started';
     } else {
-      return 'Ended';
+      return 'Vote Now';
     }
   }
 
   getStatusDescription(): string {
+    const now = Date.now();
     if (this.hasVoted) {
       return 'You have already voted in this election';
     } else if (this.isEligible) {
       return 'You are eligible to vote in this election';
-    } else if ((this.election.status === 'ACTIVE' || this.election.status === 'OPENED') && this.election.endDate <= Date.now()) {
+    } else if (now > this.election.endDate) {
       return 'This election has ended';
-    } else if (this.election.status === 'PENDING' || this.election.startDate > Date.now()) {
+    } else if (now < this.election.startDate) {
       return 'This election has not started yet';
     } else {
-      return 'This election has ended';
+      return 'You are eligible to vote in this election';
     }
   }
 }

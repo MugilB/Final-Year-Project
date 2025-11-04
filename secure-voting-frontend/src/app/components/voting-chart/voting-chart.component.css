@@ -1,5 +1,6 @@
 .voting-chart-container {
-  height: 100%;
+  height: auto;
+  max-height: 500px;
   display: flex;
   flex-direction: column;
 }
@@ -29,15 +30,15 @@
 }
 
 .chart-content {
-  flex: 1;
+  height: auto;
+  max-height: 450px;
   display: flex;
   flex-direction: column;
 }
 
 .chart-wrapper {
-  flex: 1;
-  min-height: 300px;
-  height: 400px;
+  height: 380px;
+  max-height: 380px;
   position: relative;
 }
 
@@ -137,6 +138,7 @@
   }
   
   .chart-wrapper {
-    min-height: 250px;
+    min-height: 140px;
+    height: 140px;
   }
 }

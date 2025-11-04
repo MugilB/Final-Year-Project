@@ -265,6 +265,25 @@
   transform: translateY(0);
 }
 
+/* Green neon theme for Update User button */
+.btn-update-user {
+  background: transparent !important;
+  border: 2px solid #22c55e;
+  color: #22c55e;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-update-user:hover:not(:disabled) {
+  background: #22c55e !important;
+  color: #ffffff;
+  border-color: #22c55e;
+}
+
+.btn-update-user:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
 /* Responsive Design */
 @media (max-width: 640px) {
   .user-modal-card {

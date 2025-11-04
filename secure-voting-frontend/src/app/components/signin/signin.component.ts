@@ -15,6 +15,7 @@ export class SigninComponent implements OnInit {
   signinForm: FormGroup;
   isLoading = false;
   errorMessage = '';
+  showPassword = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -103,5 +104,9 @@ export class SigninComponent implements OnInit {
   openCandidateNomination(): void {
     // Navigate to candidate nomination page
     this.router.navigate(['/candidate-nomination']);
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 }
