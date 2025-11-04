@@ -1,0 +1,60 @@
+<div class="voter-participation-chart-container">
+  <div class="chart-controls">
+    <select 
+      [(ngModel)]="selectedElectionId" 
+      (change)="onElectionChange()"
+      class="election-select">
+      <option value="">Select Election</option>
+      <option *ngFor="let election of elections" [value]="election.electionId">
+        {{ election.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="chart-content">
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading chart data...</p>
+    </div>
+
+    <div *ngIf="error && !isLoading" class="error-state">
+      <div class="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>{{ error }}</p>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && !error && selectedElectionId" class="chart-wrapper">
+      <canvas 
+        baseChart
+        [data]="pieChartData"
+        [options]="pieChartOptions"
+        [type]="pieChartType">
+      </canvas>
+      
+      <div class="chart-stats" *ngIf="totalVoters > 0">
+        <div class="stat-item">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ totalVoters }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Voted</span>
+          <span class="stat-value voted">{{ votedCount }}</span>
+          <span class="stat-percentage">({{ totalVoters > 0 ? ((votedCount / totalVoters) * 100).toFixed(1) : 0 }}%)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Not Voted</span>
+          <span class="stat-value not-voted">{{ notVotedCount }}</span>
+          <span class="stat-percentage">({{ totalVoters > 0 ? ((notVotedCount / totalVoters) * 100).toFixed(1) : 0 }}%)</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && !error && !selectedElectionId" class="empty-state">
+      <i class="fas fa-chart-pie"></i>
+      <h4>No Election Selected</h4>
+      <p>Please select an election to view voter participation.</p>
+    </div>
+  </div>
+</div>
+
