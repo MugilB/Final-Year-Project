@@ -239,9 +239,9 @@
             <button class="btn btn-sm btn-outline" (click)="manageCandidates(election)">
               <i class="fas fa-users"></i> Candidates
             </button>
-            <button class="btn btn-sm btn-outline" (click)="viewResults(election)">
+            <!-- <button class="btn btn-sm btn-outline" (click)="viewResults(election)">
               <i class="fas fa-chart-bar"></i> Results
-            </button>
+            </button> -->
             <button class="btn btn-sm btn-danger" (click)="deleteElection(election)">
               <i class="fas fa-trash"></i> Delete
             </button>
@@ -638,36 +638,6 @@
             </div>
           </div>
           
-          <!-- Settings Card -->
-          <div class="info-card">
-            <div class="card-header">
-              <div class="card-icon">
-                <i class="fas fa-cog"></i>
-              </div>
-              <h3 class="card-title">Election Settings</h3>
-            </div>
-            <div class="card-content">
-              <div class="input-group">
-                <label class="input-label">
-                  <i class="fas fa-toggle-on"></i>
-                  Initial Status
-                  <span class="required">*</span>
-                </label>
-                <select 
-                  class="modern-select" 
-                  [(ngModel)]="electionFormData.status"
-                  name="electionStatus"
-                  required
-                >
-                  <option value="SCHEDULED">Scheduled - Election is planned but not yet active</option>
-                  <option value="OPENED">Opened - Voting is currently active</option>
-                  <option value="CLOSED">Closed - Voting has ended</option>
-                  <option value="CANCELLED">Cancelled - Election has been cancelled</option>
-                </select>
-                <div class="input-hint">Set the initial status of the election</div>
-              </div>
-            </div>
-          </div>
 
         </form>
       </div>

@@ -23,7 +23,7 @@ public class BlockchainService {
     private UserRepository userRepository;
 
     @Autowired
-    private CryptoService cryptoService;
+    private UnifiedCryptoService cryptoService;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();

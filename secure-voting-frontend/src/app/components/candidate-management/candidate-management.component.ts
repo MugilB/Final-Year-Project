@@ -91,6 +91,12 @@ export class CandidateManagementComponent implements OnInit, OnChanges {
         const candidateStatus = this.getCandidateStatus(candidate);
         return candidateStatus === this.selectedStatusFilter;
       });
+    } else {
+      // By default, exclude REJECTED candidates unless explicitly filtered
+      filtered = filtered.filter(candidate => {
+        const candidateStatus = this.getCandidateStatus(candidate);
+        return candidateStatus !== 'REJECTED';
+      });
     }
 
     // Filter by search term
@@ -208,10 +214,12 @@ export class CandidateManagementComponent implements OnInit, OnChanges {
 
   approveCandidate(): void {
     if (this.selectedNominationCandidate) {
-      const currentStatus = this.getCandidateStatus(this.selectedNominationCandidate);
+      const candidate = this.selectedNominationCandidate;
+      const candidateId = candidate.candidateId;
+      const currentStatus = this.getCandidateStatus(candidate);
       const action = currentStatus === 'APPROVED' ? 'move to pending' : 'approve';
       
-      if (confirm(`Are you sure you want to ${action} "${this.selectedNominationCandidate.name}"?`)) {
+      if (confirm(`Are you sure you want to ${action} "${candidate.name}"?`)) {
         const newStatus = currentStatus === 'APPROVED' ? 'PENDING' : 'APPROVED';
         
         const request: UpdateCandidateStatusRequest = {
@@ -220,12 +228,22 @@ export class CandidateManagementComponent implements OnInit, OnChanges {
           reviewedBy: 'Admin' // You can get this from auth service
         };
         
-        this.dataService.updateCandidateStatus(this.selectedNominationCandidate.candidateId, request).subscribe({
+        this.dataService.updateCandidateStatus(candidateId, request).subscribe({
           next: (updatedCandidate) => {
             console.log('Candidate status updated successfully:', updatedCandidate);
+            
+            // Update the candidate in the local array
+            const index = this.candidates.findIndex(
+              c => c.candidateId === candidateId
+            );
+            if (index !== -1) {
+              this.candidates[index] = updatedCandidate;
+            }
+            
             alert(`Candidate ${action}d successfully!`);
             this.closeNominationModal();
-            this.loadCandidates(); // Refresh the list
+            // Optionally reload to ensure data consistency, but local update provides immediate feedback
+            // this.loadCandidates();
           },
           error: (error) => {
             console.error('Error updating candidate status:', error);
@@ -238,10 +256,12 @@ export class CandidateManagementComponent implements OnInit, OnChanges {
 
   rejectCandidate(): void {
     if (this.selectedNominationCandidate) {
-      const currentStatus = this.getCandidateStatus(this.selectedNominationCandidate);
+      const candidate = this.selectedNominationCandidate;
+      const candidateId = candidate.candidateId;
+      const currentStatus = this.getCandidateStatus(candidate);
       const action = currentStatus === 'REJECTED' ? 'move to pending' : 'reject';
       
-      if (confirm(`Are you sure you want to ${action} "${this.selectedNominationCandidate.name}"?`)) {
+      if (confirm(`Are you sure you want to ${action} "${candidate.name}"?`)) {
         const newStatus = currentStatus === 'REJECTED' ? 'PENDING' : 'REJECTED';
         
         const request: UpdateCandidateStatusRequest = {
@@ -250,12 +270,32 @@ export class CandidateManagementComponent implements OnInit, OnChanges {
           reviewedBy: 'Admin' // You can get this from auth service
         };
         
-        this.dataService.updateCandidateStatus(this.selectedNominationCandidate.candidateId, request).subscribe({
+        this.dataService.updateCandidateStatus(candidateId, request).subscribe({
           next: (updatedCandidate) => {
             console.log('Candidate status updated successfully:', updatedCandidate);
+            
+            // If candidate was rejected, remove from local array immediately
+            if (newStatus === 'REJECTED') {
+              const index = this.candidates.findIndex(
+                c => c.candidateId === candidateId
+              );
+              if (index !== -1) {
+                this.candidates.splice(index, 1);
+              }
+            } else {
+              // Update the candidate in the local array
+              const index = this.candidates.findIndex(
+                c => c.candidateId === candidateId
+              );
+              if (index !== -1) {
+                this.candidates[index] = updatedCandidate;
+              }
+            }
+            
             alert(`Candidate ${action}ed successfully!`);
             this.closeNominationModal();
-            this.loadCandidates(); // Refresh the list
+            // Optionally reload to ensure data consistency, but local update provides immediate feedback
+            // this.loadCandidates();
           },
           error: (error) => {
             console.error('Error updating candidate status:', error);
@@ -273,9 +313,21 @@ export class CandidateManagementComponent implements OnInit, OnChanges {
   }
 
   editCandidate(candidate: Candidate) {
-    this.isEditingCandidate = true;
-    this.editingCandidate = candidate;
-    this.showCandidateModal = true;
+    // Fetch the candidate by ID to ensure we have the latest data with candidateDetails
+    this.dataService.getCandidateById(candidate.candidateId).subscribe({
+      next: (freshCandidate) => {
+        this.isEditingCandidate = true;
+        this.editingCandidate = freshCandidate; // Use the fresh candidate with full details
+        this.showCandidateModal = true;
+      },
+      error: (error) => {
+        console.error('Error fetching candidate details:', error);
+        // Fallback to using the candidate from the list
+        this.isEditingCandidate = true;
+        this.editingCandidate = candidate;
+        this.showCandidateModal = true;
+      }
+    });
   }
 
   deleteCandidate(candidate: Candidate) {
@@ -295,19 +347,82 @@ export class CandidateManagementComponent implements OnInit, OnChanges {
 
   closeCandidateModal() {
     this.showCandidateModal = false;
-    this.isEditingCandidate = false;
-    this.editingCandidate = null;
+    // Reset editing state after a short delay to prevent change detection issues
+    setTimeout(() => {
+      this.isEditingCandidate = false;
+      this.editingCandidate = null;
+    }, 100);
   }
 
   saveCandidate(event: { candidate: CreateCandidateRequest | UpdateCandidateRequest, isEdit: boolean }) {
     if (event.isEdit && this.editingCandidate) {
+      const updateRequest = event.candidate as UpdateCandidateRequest;
+      const candidateId = this.editingCandidate.candidateId;
+      
       // Update existing candidate
-      this.dataService.updateCandidate(this.editingCandidate.candidateId, event.candidate as UpdateCandidateRequest).subscribe({
+      this.dataService.updateCandidate(candidateId, updateRequest).subscribe({
         next: (updatedCandidate) => {
           console.log('Candidate updated successfully:', updatedCandidate);
-          this.loadCandidates();
+          
+          // Immediately update the local candidate with the data we know was saved
+          // This ensures the UI reflects the changes right away
+          const index = this.candidates.findIndex(c => c.candidateId === candidateId);
+          if (index !== -1) {
+            // Merge the updated data with the existing candidate
+            const existingDetails = this.candidates[index].candidateDetails;
+            const updatedDetails = updatedCandidate.candidateDetails;
+            
+            // Merge all candidateDetails fields from the update request
+            this.candidates[index] = {
+              ...this.candidates[index],
+              ...updatedCandidate,
+              candidateDetails: {
+                candidateId: candidateId, // Ensure candidateId is always present
+                ...existingDetails,
+                ...updatedDetails,
+                // Update all fields from the request
+                email: updateRequest.email !== undefined ? updateRequest.email : (updatedDetails?.email || existingDetails?.email),
+                phoneNumber: updateRequest.phoneNumber !== undefined ? updateRequest.phoneNumber : (updatedDetails?.phoneNumber || existingDetails?.phoneNumber),
+                gender: updateRequest.gender !== undefined ? updateRequest.gender : (updatedDetails?.gender || existingDetails?.gender),
+                age: updateRequest.age !== undefined ? updateRequest.age : (updatedDetails?.age || existingDetails?.age),
+                address: updateRequest.address !== undefined ? updateRequest.address : (updatedDetails?.address || existingDetails?.address),
+                aadharCardLink: updateRequest.aadharCardLink !== undefined ? updateRequest.aadharCardLink : (updatedDetails?.aadharCardLink || existingDetails?.aadharCardLink),
+                candidateImageLink: updateRequest.candidateImageLink !== undefined ? updateRequest.candidateImageLink : (updatedDetails?.candidateImageLink || existingDetails?.candidateImageLink),
+                biography: updateRequest.biography !== undefined ? updateRequest.biography : (updatedDetails?.biography || existingDetails?.biography || undefined),
+                manifestoSummary: updateRequest.manifestoSummary !== undefined ? updateRequest.manifestoSummary : (updatedDetails?.manifestoSummary || existingDetails?.manifestoSummary || undefined)
+              }
+            };
+          }
+          
+          // Close modal first (before alert to avoid blocking)
           this.closeCandidateModal();
-          alert('Candidate updated successfully!');
+          
+          // Fetch the candidate again after a short delay to ensure backend has persisted
+          // This ensures we have the latest data when the user reopens the modal
+          setTimeout(() => {
+            this.dataService.getCandidateById(candidateId).subscribe({
+              next: (freshCandidate) => {
+                // Update the candidate in the list with the fresh data from backend
+                const idx = this.candidates.findIndex(c => c.candidateId === candidateId);
+                if (idx !== -1) {
+                  this.candidates[idx] = freshCandidate;
+                }
+                // Only update editingCandidate if modal is not open to prevent infinite loop
+                if (!this.showCandidateModal && this.editingCandidate?.candidateId === candidateId) {
+                  this.editingCandidate = freshCandidate;
+                }
+              },
+              error: (fetchError) => {
+                console.error('Error fetching updated candidate:', fetchError);
+                // Silently fail - we already updated the local data
+              }
+            });
+          }, 500);
+          
+          // Show alert
+          setTimeout(() => {
+            alert('Candidate updated successfully!');
+          }, 100);
         },
         error: (error) => {
           console.error('Error updating candidate:', error);
@@ -325,7 +440,9 @@ export class CandidateManagementComponent implements OnInit, OnChanges {
           console.log('Candidate created successfully:', newCandidate);
           this.loadCandidates();
           this.closeCandidateModal();
-          alert('Candidate created successfully!');
+          setTimeout(() => {
+            alert('Candidate created successfully!');
+          }, 100);
         },
         error: (error) => {
           console.error('Error creating candidate:', error);

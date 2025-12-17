@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -50,79 +50,64 @@ export class UserModalComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.loadWards();
+    this.isSubmitting = false; // Ensure loading state is reset on init
+    this.loadUserData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Reload data when modal opens or when user/isEdit changes
+    const isOpenChanged = changes['isOpen'];
+    const userChanged = changes['user'];
+    const isEditChanged = changes['isEdit'];
     
-    if (this.isEdit && this.user) {
-      console.log('Editing user with data:', this.user);
-      console.log('User personal info:', {
-        firstName: this.user.firstName,
-        lastName: this.user.lastName,
-        phoneNumber: this.user.phoneNumber,
-        gender: this.user.gender,
-        address: this.user.address,
-        wardId: this.user.wardId,
-        bloodGroup: this.user.bloodGroup
-      });
+    // Always reload when modal becomes open
+    if (isOpenChanged && this.isOpen) {
+      // Reset loading state when modal opens
+      this.isSubmitting = false;
       
-      this.userForm.patchValue({
-        username: this.user.voterId || this.user.username,
-        email: this.user.email,
-        role: this.user.role,
-        approvalStatus: this.user.approvalStatus || 1,
-        firstName: this.user.firstName || '',
-        lastName: this.user.lastName || '',
-        phoneNumber: this.user.phoneNumber || '',
-        dateOfBirth: this.user.dateOfBirth ? new Date(this.user.dateOfBirth).toISOString().split('T')[0] : '',
-        gender: this.user.gender || '',
-        address: this.user.address || '',
-        wardId: this.user.wardId || '',
-        bloodGroup: this.user.bloodGroup || '',
-        aadharCardLink: this.user.aadharCardLink || '',
-        profilePictureLink: this.user.profilePictureLink || ''
-      });
+      // Small delay to ensure all inputs are set
+      setTimeout(() => {
+        this.loadUserData();
+      }, 150);
+    } 
+    // Also reload if user or edit mode changes while modal is open
+    else if (this.isOpen && (userChanged || isEditChanged)) {
+      // Reset loading state
+      this.isSubmitting = false;
       
-      // Make all fields optional for editing
-      this.userForm.get('username')?.clearValidators();
-      this.userForm.get('username')?.updateValueAndValidity();
-      
-      this.userForm.get('email')?.clearValidators();
-      this.userForm.get('email')?.updateValueAndValidity();
-      
-      this.userForm.get('password')?.clearValidators();
-      this.userForm.get('password')?.updateValueAndValidity();
-      
-      this.userForm.get('role')?.clearValidators();
-      this.userForm.get('role')?.updateValueAndValidity();
+      setTimeout(() => {
+        this.loadUserData();
+      }, 150);
     }
   }
 
-  ngOnChanges(): void {
+  private loadUserData(): void {
     if (this.isEdit && this.user) {
-      console.log('ngOnChanges - Editing user with data:', this.user);
-      console.log('ngOnChanges - User personal info:', {
-        firstName: this.user.firstName,
-        lastName: this.user.lastName,
-        phoneNumber: this.user.phoneNumber,
-        gender: this.user.gender,
-        address: this.user.address,
-        wardId: this.user.wardId,
-        bloodGroup: this.user.bloodGroup
-      });
+      console.log('Loading user data:', this.user);
+      
+      // Handle null/undefined/empty values properly
+      const cleanValue = (value: any, placeholders: string[] = []) => {
+        if (!value || value === 'null' || value === 'undefined') return '';
+        const strValue = String(value).trim();
+        if (strValue === '' || placeholders.includes(strValue)) return '';
+        return strValue;
+      };
       
       this.userForm.patchValue({
-        username: this.user.voterId || this.user.username,
-        email: this.user.email,
-        role: this.user.role,
+        username: this.user.voterId || this.user.username || '',
+        email: this.user.email || '',
+        role: this.user.role || 'USER',
         approvalStatus: this.user.approvalStatus || 1,
-        firstName: this.user.firstName || '',
-        lastName: this.user.lastName || '',
-        phoneNumber: this.user.phoneNumber || '',
+        firstName: cleanValue(this.user.firstName),
+        lastName: cleanValue(this.user.lastName),
+        phoneNumber: cleanValue(this.user.phoneNumber),
         dateOfBirth: this.user.dateOfBirth ? new Date(this.user.dateOfBirth).toISOString().split('T')[0] : '',
-        gender: this.user.gender || '',
-        address: this.user.address || '',
-        wardId: this.user.wardId || '',
-        bloodGroup: this.user.bloodGroup || '',
-        aadharCardLink: this.user.aadharCardLink || '',
-        profilePictureLink: this.user.profilePictureLink || ''
+        gender: cleanValue(this.user.gender),
+        address: cleanValue(this.user.address, ['Address not provided']),
+        wardId: this.user.wardId !== undefined && this.user.wardId !== null ? String(this.user.wardId) : '',
+        bloodGroup: cleanValue(this.user.bloodGroup),
+        aadharCardLink: cleanValue(this.user.aadharCardLink, ['Aadhar Card not provided']),
+        profilePictureLink: cleanValue(this.user.profilePictureLink, ['Profile Picture not provided'])
       });
       
       // Make all fields optional for editing
@@ -137,8 +122,7 @@ export class UserModalComponent implements OnInit, OnChanges {
       
       this.userForm.get('role')?.clearValidators();
       this.userForm.get('role')?.updateValueAndValidity();
-      
-    } else {
+    } else if (!this.isEdit) {
       // Reset form for create
       this.userForm.reset();
       this.userForm.patchValue({ 

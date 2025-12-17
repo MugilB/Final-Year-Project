@@ -45,7 +45,10 @@ export class AuthService {
       username: credentials.username,
       password: credentials.password
     }, httpOptions).pipe(
-      catchError(this.handleError)
+      catchError((error) => {
+        // Preserve the original error with status code for component handling
+        return throwError(() => error);
+      })
     );
   }
 
@@ -66,7 +69,8 @@ export class AuthService {
       const date = new Date();
       date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
       const expires = 'expires=' + date.toUTCString();
-      document.cookie = `${name}=${value};${expires};path=/;SameSite=Strict`;
+      // Use Lax instead of Strict for better compatibility with cross-port requests
+      document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax`;
     }
   }
 
@@ -96,8 +100,8 @@ export class AuthService {
       this.deleteCookie('auth-token');
       this.deleteCookie('auth-user');
       // Also clear sessionStorage for backward compatibility
-      if (typeof window !== 'undefined') {
-        window.sessionStorage.clear();
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.clear();
       }
     }
   }
@@ -115,6 +119,7 @@ export class AuthService {
     // Try to get from cookie first
     const cookieToken = this.getCookie('auth-token');
     if (cookieToken) {
+      console.log('Token retrieved from cookie');
       return cookieToken;
     }
     // Fallback to sessionStorage for backward compatibility
@@ -122,10 +127,12 @@ export class AuthService {
       const sessionToken = window.sessionStorage.getItem('auth-token');
       // If found in sessionStorage but not in cookie, migrate it
       if (sessionToken) {
+        console.log('Token found in sessionStorage, migrating to cookie');
         this.setCookie('auth-token', sessionToken, 7);
         return sessionToken;
       }
     }
+    console.warn('No token found in cookie or sessionStorage');
     return null;
   }
 

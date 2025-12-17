@@ -170,6 +170,34 @@
   font-size: 16px;
 }
 
+.eligibility-message {
+  font-size: 13px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.eligibility-message.eligible {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+}
+
+.eligibility-message.ineligible {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.eligibility-message i {
+  font-size: 14px;
+}
+
 .form-actions {
   display: flex;
   gap: 16px;

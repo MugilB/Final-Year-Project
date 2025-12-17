@@ -57,3 +57,10 @@ public class UpdateCandidateStatusRequest {
 
 
 
+
+
+
+
+
+
+

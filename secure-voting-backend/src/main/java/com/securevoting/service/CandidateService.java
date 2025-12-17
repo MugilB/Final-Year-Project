@@ -32,7 +32,7 @@ public class CandidateService {
     private BlockRepository blockRepository;
 
     @Autowired
-    private CryptoService cryptoService;
+    private UnifiedCryptoService cryptoService;
 
     // Get all candidates
     public List<Candidate> getAllCandidates() {
@@ -173,22 +173,109 @@ public class CandidateService {
         
         Candidate candidate = candidateOpt.get();
         candidate.setName(request.getName());
+        if (request.getElectionId() != null) {
+            candidate.setElectionId(request.getElectionId());
+        }
         candidate.setPartyId(request.getPartyId());
         candidate.setWardId(request.getWardId());
         
         Candidate savedCandidate = candidateRepository.save(candidate);
         
-        // Update or create candidate details
+        // Update candidate details if they exist
+        // We only update existing candidateDetails to avoid constraint violations
         CandidateDetails candidateDetails = candidateDetailsRepository.findByCandidateId(candidateId);
         
-        if (candidateDetails == null) {
-            candidateDetails = new CandidateDetails();
-            candidateDetails.setCandidateId(candidateId);
+        if (candidateDetails != null) {
+            boolean detailsUpdated = false;
+            
+            System.out.println("Updating candidate details for candidateId: " + candidateId);
+            System.out.println("Request email: " + request.getEmail());
+            System.out.println("Request phoneNumber: " + request.getPhoneNumber());
+            System.out.println("Request gender: " + request.getGender());
+            System.out.println("Request age: " + request.getAge());
+            System.out.println("Request address: " + request.getAddress());
+            
+            // Update biography and manifesto - allow empty strings to clear the field
+            if (request.getBiography() != null) {
+                String bioValue = request.getBiography().trim();
+                candidateDetails.setBiography(bioValue.isEmpty() ? null : bioValue);
+                detailsUpdated = true;
+            }
+            if (request.getManifestoSummary() != null) {
+                String manifestoValue = request.getManifestoSummary().trim();
+                candidateDetails.setManifestoSummary(manifestoValue.isEmpty() ? null : manifestoValue);
+                detailsUpdated = true;
+            }
+            
+            // Update personal information fields if provided (required fields)
+            // In edit mode, these fields should always be provided and non-empty (validated on frontend)
+            if (request.getEmail() != null) {
+                String emailValue = request.getEmail().trim();
+                if (!emailValue.isEmpty()) {
+                    candidateDetails.setEmail(emailValue);
+                    detailsUpdated = true;
+                }
+            }
+            if (request.getPhoneNumber() != null) {
+                String phoneValue = request.getPhoneNumber().trim();
+                if (!phoneValue.isEmpty()) {
+                    candidateDetails.setPhoneNumber(phoneValue);
+                    detailsUpdated = true;
+                }
+            }
+            if (request.getGender() != null) {
+                String genderValue = request.getGender().trim();
+                if (!genderValue.isEmpty()) {
+                    candidateDetails.setGender(genderValue);
+                    detailsUpdated = true;
+                }
+            }
+            if (request.getAge() != null && request.getAge() > 0) {
+                candidateDetails.setAge(request.getAge());
+                detailsUpdated = true;
+            }
+            if (request.getAddress() != null) {
+                String addressValue = request.getAddress().trim();
+                if (!addressValue.isEmpty()) {
+                    candidateDetails.setAddress(addressValue);
+                    detailsUpdated = true;
+                }
+            }
+            if (request.getAadharCardLink() != null) {
+                String aadharValue = request.getAadharCardLink().trim();
+                if (!aadharValue.isEmpty()) {
+                    candidateDetails.setAadharCardLink(aadharValue);
+                    detailsUpdated = true;
+                }
+            }
+            // Optional field - allow empty string to clear it
+            if (request.getCandidateImageLink() != null) {
+                String imageValue = request.getCandidateImageLink().trim();
+                candidateDetails.setCandidateImageLink(imageValue.isEmpty() ? null : imageValue);
+                detailsUpdated = true;
+            }
+            
+            // Save candidateDetails if any fields were updated
+            if (detailsUpdated) {
+                System.out.println("Saving candidateDetails with updates...");
+                candidateDetailsRepository.save(candidateDetails);
+                System.out.println("CandidateDetails saved successfully");
+            } else {
+                System.out.println("No candidateDetails fields were updated");
+            }
+            
+            // Reload candidateDetails to ensure it's attached to the candidate for response
+            candidateDetails = candidateDetailsRepository.findByCandidateId(candidateId);
+            if (candidateDetails != null) {
+                savedCandidate.setCandidateDetails(candidateDetails);
+                System.out.println("CandidateDetails attached to candidate response");
+            }
+        } else {
+            // If candidateDetails doesn't exist, we can only create it if all required fields are provided
+            // For now, we'll skip creating it to avoid constraint violations
+            // In the future, we could add validation to ensure all required fields are present
+            System.err.println("Warning: CandidateDetails not found for candidateId: " + candidateId + ". Cannot update details.");
         }
-        
-        candidateDetails.setBiography(request.getBiography());
-        candidateDetails.setManifestoSummary(request.getManifestoSummary());
-        candidateDetailsRepository.save(candidateDetails);
         
         return savedCandidate;
     }
@@ -202,21 +289,69 @@ public class CandidateService {
         }
         
         Candidate candidate = candidateOpt.get();
-        candidate.setStatus(CandidateStatus.valueOf(status.toUpperCase()));
-        candidate.setUpdatedAt(System.currentTimeMillis());
         
-        Candidate savedCandidate = candidateRepository.save(candidate);
-        
-        // Update candidate details with review information
-        CandidateDetails candidateDetails = candidateDetailsRepository.findByCandidateId(candidateId);
-        if (candidateDetails != null) {
-            candidateDetails.setReviewNotes(reviewNotes);
-            candidateDetails.setReviewedBy(reviewedBy);
-            candidateDetails.setReviewedAt(System.currentTimeMillis());
-            candidateDetailsRepository.save(candidateDetails);
+        // Validate and convert status
+        try {
+            candidate.setStatus(CandidateStatus.valueOf(status.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid status: " + status, e);
         }
         
+        candidate.setUpdatedAt(System.currentTimeMillis());
+        
+        // IMPORTANT: Clear candidateDetails reference BEFORE saving to prevent cascade issues
+        // The CascadeType.ALL on Candidate.candidateDetails can cause Hibernate to try
+        // to persist a new CandidateDetails even if it's null or transient
+        candidate.setCandidateDetails(null);
+        
+        // Save candidate first - this is the primary operation
+        Candidate savedCandidate = candidateRepository.save(candidate);
+        
+        // Now try to update candidate details separately
+        // This is a secondary operation and should not block the status update
+        updateCandidateDetailsReviewInfo(candidateId, reviewNotes, reviewedBy);
+        
         return savedCandidate;
+    }
+    
+    /**
+     * Helper method to update candidate details review information.
+     * This is separated to ensure it doesn't block the candidate status update.
+     * If candidateDetails doesn't exist, this method silently skips the update.
+     * This method is NOT transactional to prevent it from affecting the main transaction.
+     */
+    @Transactional(noRollbackFor = {org.springframework.dao.DataIntegrityViolationException.class, Exception.class})
+    private void updateCandidateDetailsReviewInfo(int candidateId, String reviewNotes, String reviewedBy) {
+        try {
+            // Try to load candidateDetails - if it doesn't exist, findByCandidateId returns null
+            // We don't use existsByCandidateId as it might trigger a flush that causes issues
+            CandidateDetails candidateDetails = candidateDetailsRepository.findByCandidateId(candidateId);
+            
+            if (candidateDetails != null) {
+                // Only update review-related fields, don't modify required fields
+                if (reviewNotes != null) {
+                    candidateDetails.setReviewNotes(reviewNotes);
+                }
+                if (reviewedBy != null) {
+                    candidateDetails.setReviewedBy(reviewedBy);
+                }
+                candidateDetails.setReviewedAt(System.currentTimeMillis());
+                // Save the existing entity (this should be an UPDATE, not INSERT)
+                candidateDetailsRepository.save(candidateDetails);
+            }
+            // If candidateDetails is null, it doesn't exist - this is fine, just skip silently
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Specifically catch constraint violations and log but don't fail
+            // This can happen if Hibernate tries to INSERT instead of UPDATE
+            System.err.println("Warning: Could not update candidate details - constraint violation: " + e.getMessage());
+            System.err.println("This is expected if candidateDetails doesn't exist or has missing required fields.");
+            System.err.println("Candidate status was updated successfully.");
+        } catch (Exception e) {
+            // Log other errors but don't fail
+            System.err.println("Warning: Could not update candidate details review information: " + e.getMessage());
+            System.err.println("Candidate status was updated successfully.");
+            e.printStackTrace();
+        }
     }
 
     // Delete candidate

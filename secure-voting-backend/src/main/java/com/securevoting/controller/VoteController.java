@@ -9,7 +9,7 @@ import com.securevoting.repository.CandidateRepository;
 import com.securevoting.repository.ElectionRepository;
 import com.securevoting.repository.UserDetailsRepository;
 import com.securevoting.security.services.UserDetailsImpl;
-import com.securevoting.service.CryptoService;
+import com.securevoting.service.UnifiedCryptoService;
 import com.securevoting.service.SteganographyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +36,7 @@ public class VoteController {
     private BlockRepository blockRepository;
 
     @Autowired
-    private CryptoService cryptoService;
+    private UnifiedCryptoService cryptoService;
 
     @Autowired
     private SteganographyService steganographyService;

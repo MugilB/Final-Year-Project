@@ -59,6 +59,92 @@
         </div>
       </div>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input 
+            type="email" 
+            id="email" 
+            [(ngModel)]="candidateForm.email" 
+            name="email"
+            placeholder="Enter email address"
+            [disabled]="isSubmitting">
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number *</label>
+          <input 
+            type="tel" 
+            id="phoneNumber" 
+            [(ngModel)]="candidateForm.phoneNumber" 
+            name="phoneNumber"
+            placeholder="Enter phone number"
+            [disabled]="isSubmitting">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="gender">Gender *</label>
+          <select 
+            id="gender" 
+            [(ngModel)]="candidateForm.gender" 
+            name="gender"
+            [disabled]="isSubmitting">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="age">Age *</label>
+          <input 
+            type="number" 
+            id="age" 
+            [(ngModel)]="candidateForm.age" 
+            name="age"
+            placeholder="Enter age"
+            min="18"
+            max="100"
+            [disabled]="isSubmitting">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address *</label>
+        <textarea 
+          id="address" 
+          [(ngModel)]="candidateForm.address" 
+          name="address"
+          placeholder="Enter complete address"
+          rows="3"
+          [disabled]="isSubmitting"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="aadharCardLink">Aadhar Card Link (Google Drive) *</label>
+        <input 
+          type="url" 
+          id="aadharCardLink" 
+          [(ngModel)]="candidateForm.aadharCardLink" 
+          name="aadharCardLink"
+          placeholder="https://drive.google.com/file/d/..."
+          [disabled]="isSubmitting">
+      </div>
+
+      <div class="form-group">
+        <label for="candidateImageLink">Candidate Image Link (Google Drive)</label>
+        <input 
+          type="url" 
+          id="candidateImageLink" 
+          [(ngModel)]="candidateForm.candidateImageLink" 
+          name="candidateImageLink"
+          placeholder="https://drive.google.com/file/d/... (optional)"
+          [disabled]="isSubmitting">
+      </div>
+
       <div class="form-group">
         <label for="biography">Biography</label>
         <textarea 
@@ -93,6 +179,8 @@
     </form>
   </div>
 </div>
+
+
 
 
 

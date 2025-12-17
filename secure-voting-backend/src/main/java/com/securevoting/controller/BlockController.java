@@ -2,7 +2,7 @@ package com.securevoting.controller;
 
 import com.securevoting.model.Block;
 import com.securevoting.service.BlockService;
-import com.securevoting.service.CryptoService;
+import com.securevoting.service.UnifiedCryptoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ public class BlockController {
     private BlockService blockService;
     
     @Autowired
-    private CryptoService cryptoService;
+    private UnifiedCryptoService cryptoService;
     
     @GetMapping
     public ResponseEntity<List<Block>> getAllBlocks() {

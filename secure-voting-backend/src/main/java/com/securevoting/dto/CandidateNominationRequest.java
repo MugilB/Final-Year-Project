@@ -6,6 +6,7 @@ public class CandidateNominationRequest {
     
     @NotBlank(message = "Candidate name is required")
     @Size(min = 2, max = 100, message = "Candidate name must be between 2 and 100 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s\\-']+$", message = "Candidate name cannot contain numbers")
     private String candidateName;
     
     @NotBlank(message = "Gender is required")

@@ -10,10 +10,11 @@ public class VoterRegistrationRequest {
 
     @NotBlank(message = "First name is required")
     @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s\\-']+$", message = "First name cannot contain numbers")
     private String firstName;
 
     @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
+    @Pattern(regexp = "^[a-zA-Z\\s\\-']+$", message = "Last name cannot contain numbers")
     private String lastName;
 
     @NotBlank(message = "Address is required")

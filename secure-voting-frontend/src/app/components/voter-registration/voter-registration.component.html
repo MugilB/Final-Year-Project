@@ -86,6 +86,12 @@
           <div class="error-message" *ngIf="getFieldError('dateOfBirth')">
             {{ getFieldError('dateOfBirth') }}
           </div>
+          <div class="eligibility-message" *ngIf="ageMessage && !getFieldError('dateOfBirth')" 
+               [class.eligible]="isEligible" 
+               [class.ineligible]="!isEligible">
+            <i class="fas" [class.fa-check-circle]="isEligible" [class.fa-exclamation-circle]="!isEligible"></i>
+            {{ ageMessage }}
+          </div>
         </div>
 
         <div class="form-group">
@@ -229,7 +235,7 @@
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="isLoading || voterForm.invalid"
+          [disabled]="isLoading || !isFormValid"
         >
           <span *ngIf="isLoading" class="spinner"></span>
           {{ isLoading ? 'Registering...' : 'Register as Voter' }}

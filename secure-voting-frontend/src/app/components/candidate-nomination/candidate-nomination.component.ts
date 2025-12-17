@@ -25,7 +25,7 @@ export class CandidateNominationComponent implements OnInit {
     private http: HttpClient
   ) {
     this.candidateForm = this.formBuilder.group({
-      candidateName: ['', [Validators.required, Validators.minLength(2)]],
+      candidateName: ['', [Validators.required, Validators.minLength(2), this.noNumbersValidator]],
       gender: ['', [Validators.required]],
       age: ['', [Validators.required, Validators.min(18), Validators.max(100)]],
       email: ['', [Validators.required, Validators.email]],
@@ -38,6 +38,20 @@ export class CandidateNominationComponent implements OnInit {
       candidateImageLink: ['', [Validators.pattern(/^https:\/\/drive\.google\.com\/.*$/)]],
       electionId: ['', [Validators.required]]
     }, { validators: this.partyValidation });
+  }
+
+  noNumbersValidator(control: any) {
+    if (!control.value) {
+      return null; // Let required validator handle empty values
+    }
+    
+    const value = control.value.toString().trim();
+    // Check if the value contains any numbers (0-9)
+    if (/\d/.test(value)) {
+      return { containsNumbers: true };
+    }
+    
+    return null;
   }
 
   ngOnInit(): void {
@@ -162,6 +176,9 @@ export class CandidateNominationComponent implements OnInit {
       }
       if (field.errors['max']) {
         return `${this.getFieldDisplayName(fieldName)} must not exceed ${field.errors['max'].max}`;
+      }
+      if (field.errors['containsNumbers']) {
+        return `${this.getFieldDisplayName(fieldName)} cannot contain numbers`;
       }
       if (field.errors['pattern']) {
         if (fieldName === 'phoneNumber') {

@@ -93,6 +93,7 @@ public class CryptoService {
         KeyPair ephemeralKeyPair = generateEccKeyPair();
         PublicKey ephemeralPublicKey = ephemeralKeyPair.getPublic();
         PrivateKey ephemeralPrivateKey = ephemeralKeyPair.getPrivate();
+        System.out.println("ECC - Temperory Key pair has been generated");
 
         KeyAgreement keyAgreement = KeyAgreement.getInstance(KEY_AGREEMENT_ALGORITHM, PROVIDER);
         keyAgreement.init(ephemeralPrivateKey);
@@ -106,7 +107,7 @@ public class CryptoService {
         byte[] derivedKey = hash.digest(sharedSecret);
         SecretKey aesKey = new SecretKeySpec(derivedKey, 0, 32, SYMMETRIC_ALGORITHM);
         
-        System.out.println("Successfully derived AES key using SHA-256");
+        System.out.println("Successfully converted secure_secret_key into AES key using SHA-256");
 
         // Step 3: AES-GCM Encryption
         Cipher aesCipher = Cipher.getInstance(SYMMETRIC_TRANSFORMATION, PROVIDER);
@@ -116,14 +117,21 @@ public class CryptoService {
         aesCipher.init(Cipher.ENCRYPT_MODE, aesKey, parameterSpec);
         byte[] cipherText = aesCipher.doFinal(voteJson.getBytes());
         
-        System.out.println("Successfully encrypted vote using AES-GCM");
+        System.out.println("Successfully encrypted vote using AES-GCM by AES key");
 
         // Create VotePayload with X.509 encoded ephemeral public key
         String ephemeralPublicKeyB64 = Base64.getEncoder().encodeToString(ephemeralPublicKey.getEncoded());
         String ivB64 = Base64.getEncoder().encodeToString(iv);
         String cipherTextB64 = Base64.getEncoder().encodeToString(cipherText);
 
-        VotePayload payload = new VotePayload(ephemeralPublicKeyB64, ivB64, cipherTextB64);
+        // Use new constructor with algorithm and hmac (hmac will be added by UnifiedCryptoService if needed)
+        VotePayload payload = new VotePayload();
+        payload.setAlgorithm("ECDH");
+        payload.setEphemeralPublicKey(ephemeralPublicKeyB64);
+        payload.setIv(ivB64);
+        payload.setCipherText(cipherTextB64);
+        payload.setHmac(null); // HMAC will be added by UnifiedCryptoService wrapper
+        
         Gson gson = new Gson();
         String jsonResult = gson.toJson(payload);
         

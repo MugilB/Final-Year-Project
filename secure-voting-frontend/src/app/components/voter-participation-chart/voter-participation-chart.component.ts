@@ -5,6 +5,7 @@ import { ChartConfiguration, ChartData, ChartType, registerables } from 'chart.j
 import { BaseChartDirective } from 'ng2-charts';
 import { DataService, Election, Block, Voter } from '../../services/data.service';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
 import Chart from 'chart.js/auto';
 
@@ -79,7 +80,8 @@ export class VoterParticipationChartComponent implements OnInit, OnChanges, OnDe
 
   constructor(
     private dataService: DataService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private authService: AuthService
   ) {
     Chart.register(...registerables);
   }
@@ -135,6 +137,27 @@ export class VoterParticipationChartComponent implements OnInit, OnChanges, OnDe
       return;
     }
 
+    // Check authentication and admin role before making API call
+    const token = this.authService.getToken();
+    const user = this.authService.getUser();
+    const isAdmin = user?.roles?.includes('ADMIN') || user?.roles?.includes('ROLE_ADMIN');
+    
+    if (!token) {
+      console.error('No authentication token found');
+      this.error = 'Authentication required. Please log in again.';
+      this.isLoading = false;
+      this.resetChartData();
+      return;
+    }
+
+    if (!isAdmin) {
+      console.error('User does not have ADMIN role', { user, roles: user?.roles });
+      this.error = 'Admin access required to load voter data.';
+      this.isLoading = false;
+      this.resetChartData();
+      return;
+    }
+
     this.isLoading = true;
     this.error = null;
     const electionId = Number(this.selectedElectionId);
@@ -171,7 +194,8 @@ export class VoterParticipationChartComponent implements OnInit, OnChanges, OnDe
           },
           error: (error) => {
             console.error('Error loading blocks:', error);
-            this.error = 'Failed to load vote data';
+            const errorMessage = this.getErrorMessage(error);
+            this.error = `Failed to load vote data: ${errorMessage}`;
             this.isLoading = false;
             this.resetChartData();
           }
@@ -179,11 +203,30 @@ export class VoterParticipationChartComponent implements OnInit, OnChanges, OnDe
       },
       error: (error) => {
         console.error('Error loading approved voters:', error);
-        this.error = 'Failed to load voter data';
+        const errorMessage = this.getErrorMessage(error);
+        this.error = `Failed to load voter data: ${errorMessage}`;
         this.isLoading = false;
         this.resetChartData();
       }
     });
+  }
+
+  private getErrorMessage(error: any): string {
+    if (error?.status === 401) {
+      return 'Unauthorized. Your session may have expired. Please log in again.';
+    } else if (error?.status === 403) {
+      return 'Access forbidden. Admin role required.';
+    } else if (error?.status === 404) {
+      return 'Resource not found.';
+    } else if (error?.status === 500) {
+      return 'Server error. Please try again later.';
+    } else if (error?.error?.message) {
+      return error.error.message;
+    } else if (error?.message) {
+      return error.message;
+    } else {
+      return 'An unexpected error occurred.';
+    }
   }
 
   private updateChartData(): void {

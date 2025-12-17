@@ -2,10 +2,12 @@ package com.securevoting.payload.request;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 public class CreateCandidateRequest {
 
     @NotBlank(message = "Candidate name is required")
+    @Pattern(regexp = "^[a-zA-Z\\s\\-']+$", message = "Candidate name cannot contain numbers")
     private String name;
 
     @NotNull(message = "Election ID is required")
@@ -65,6 +67,9 @@ public class CreateCandidateRequest {
         this.manifestoSummary = manifestoSummary;
     }
 }
+
+
+
 
 
 

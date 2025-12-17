@@ -24,7 +24,7 @@ public class VoteService {
     private ElectionRepository electionRepository;
 
     @Autowired
-    private CryptoService cryptoService;
+    private UnifiedCryptoService cryptoService;
 
     @Autowired
     private SteganographyService steganographyService;

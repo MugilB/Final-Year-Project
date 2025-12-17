@@ -139,12 +139,17 @@ public class CandidateController {
     // Update candidate status
     @PutMapping("/{candidateId}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Candidate> updateCandidateStatus(
+    public ResponseEntity<?> updateCandidateStatus(
             @PathVariable int candidateId, 
             @RequestBody UpdateCandidateStatusRequest request) {
         try {
             if (!candidateService.getCandidateById(candidateId).isPresent()) {
                 return ResponseEntity.notFound().build();
+            }
+            
+            // Validate request
+            if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Status is required");
             }
             
             Candidate updatedCandidate = candidateService.updateCandidateStatus(
@@ -154,9 +159,13 @@ public class CandidateController {
                 request.getReviewedBy()
             );
             return ResponseEntity.ok(updatedCandidate);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            // Return error message in response body for better debugging
+            return ResponseEntity.status(500).body("Error updating candidate status: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.status(500).body("Unexpected error: " + e.getMessage());
         }
     }
 

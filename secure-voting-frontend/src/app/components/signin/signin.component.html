@@ -24,14 +24,14 @@
       <div class="form-group">
         <label for="password">Password</label>
         <div class="password-input-wrapper">
-          <input
+        <input
             [type]="showPassword ? 'text' : 'password'"
-            id="password"
-            formControlName="password"
-            class="form-control"
-            [class.error]="getFieldError('password')"
-            placeholder="Enter your password"
-          />
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.error]="getFieldError('password')"
+          placeholder="Enter your password"
+        />
           <button type="button" class="password-toggle-btn" (click)="togglePasswordVisibility()">
             <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
           </button>

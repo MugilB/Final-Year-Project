@@ -391,7 +391,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   }
 
   editUser(user: User): void {
-    this.editingUser = user;
+    // Find the user from the current list to ensure we have the latest data
+    const freshUser = this.users.find(u => (u.voterId || u.username) === (user.voterId || user.username)) || user;
+    this.editingUser = { ...freshUser }; // Create a copy to ensure reactivity
     this.isEditMode = true;
     this.showUserModal = true;
   }
@@ -437,12 +439,51 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
         return;
       }
       console.log('Updating user with ID:', userId);
-      this.dataService.updateUser(userId, event.user as UpdateUserRequest).subscribe({
+      const updateRequest = event.user as UpdateUserRequest;
+      
+      this.dataService.updateUser(userId, updateRequest).subscribe({
         next: (updatedUser) => {
           console.log('User updated successfully:', updatedUser);
-          this.loadUsers();
+          
+          // Immediately update the local user with the data we know was saved
+          const index = this.users.findIndex(u => (u.voterId || u.username) === userId);
+          if (index !== -1) {
+            // Merge the updated data with the existing user
+            // Use the request data if provided, otherwise keep existing or use response
+            this.users[index] = {
+              ...this.users[index],
+              ...updatedUser,
+              address: updateRequest.address !== undefined && updateRequest.address !== null && updateRequest.address.trim() !== '' 
+                ? updateRequest.address 
+                : (updatedUser.address || this.users[index].address || undefined),
+              wardId: updateRequest.wardId !== undefined && updateRequest.wardId !== null 
+                ? updateRequest.wardId 
+                : (updatedUser.wardId !== undefined ? updatedUser.wardId : this.users[index].wardId),
+              aadharCardLink: updateRequest.aadharCardLink !== undefined && updateRequest.aadharCardLink !== null && updateRequest.aadharCardLink.trim() !== '' 
+                ? updateRequest.aadharCardLink 
+                : (updatedUser.aadharCardLink || this.users[index].aadharCardLink || undefined),
+              profilePictureLink: updateRequest.profilePictureLink !== undefined && updateRequest.profilePictureLink !== null && updateRequest.profilePictureLink.trim() !== '' 
+                ? updateRequest.profilePictureLink 
+                : (updatedUser.profilePictureLink || this.users[index].profilePictureLink || undefined)
+            };
+          } else {
+            // If not found, reload the entire list
+            this.loadUsers();
+          }
+          
+          // Reset loading state before closing
+          this.userModalRef?.resetLoadingState();
+          
+          // Close modal first
           this.closeUserModal();
-          alert('User updated successfully!');
+          
+          // Reload users list to get fresh data
+          this.loadUsers();
+          
+          // Show alert after modal is closed
+          setTimeout(() => {
+            alert('User updated successfully!');
+          }, 100);
         },
         error: (error) => {
           console.error('Error updating user:', error);
@@ -458,9 +499,16 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       this.dataService.createUser(event.user as CreateUserRequest).subscribe({
         next: (createdUser) => {
           console.log('User created successfully:', createdUser);
+          
+          // Reset loading state before closing
+          this.userModalRef?.resetLoadingState();
+          
           this.loadUsers();
           this.closeUserModal();
-          alert('User created successfully!');
+          
+          setTimeout(() => {
+            alert('User created successfully!');
+          }, 100);
         },
         error: (error) => {
           console.error('Error creating user:', error);

@@ -66,7 +66,14 @@ export class SigninComponent implements OnInit {
         },
         error: (error) => {
           this.isLoading = false;
-          this.errorMessage = error.error?.message || 'Login failed. Please try again.';
+          
+          // Check if error is due to invalid credentials (401 Unauthorized)
+          if (error.status === 401) {
+            this.errorMessage = 'Invalid credentials. Please check your Voter ID and password.';
+          } else {
+            // For other errors, show backend message or generic error
+            this.errorMessage = error.error?.message || 'Login failed. Please try again.';
+          }
         }
       });
     } else {

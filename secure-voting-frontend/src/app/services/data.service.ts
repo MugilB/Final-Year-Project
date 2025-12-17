@@ -44,10 +44,19 @@ export interface CreateCandidateRequest {
 
 export interface UpdateCandidateRequest {
   name: string;
+  electionId?: number;
   partyId?: number;
   wardId?: number;
   biography?: string;
   manifestoSummary?: string;
+  // Candidate Details fields
+  email?: string;
+  phoneNumber?: string;
+  gender?: string;
+  age?: number;
+  address?: string;
+  aadharCardLink?: string;
+  candidateImageLink?: string;
 }
 
 export interface Election {

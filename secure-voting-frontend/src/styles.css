@@ -21,6 +21,7 @@ app-root {
   width: 100vw;
 }
 
+
 /* Global scrollbar styling - matches blockchain table */
 ::-webkit-scrollbar {
   width: 8px;
