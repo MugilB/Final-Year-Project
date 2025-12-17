@@ -124,13 +124,13 @@ public class CryptoService {
         String ivB64 = Base64.getEncoder().encodeToString(iv);
         String cipherTextB64 = Base64.getEncoder().encodeToString(cipherText);
 
-        // Use new constructor with algorithm and hmac (hmac will be added by UnifiedCryptoService if needed)
+        // Use new constructor with algorithm and hmac (hmac will be added by qq.java if needed)
         VotePayload payload = new VotePayload();
         payload.setAlgorithm("ECDH");
         payload.setEphemeralPublicKey(ephemeralPublicKeyB64);
         payload.setIv(ivB64);
         payload.setCipherText(cipherTextB64);
-        payload.setHmac(null); // HMAC will be added by UnifiedCryptoService wrapper
+        payload.setHmac(null); // HMAC will be added by qq.java wrapper
         
         Gson gson = new Gson();
         String jsonResult = gson.toJson(payload);

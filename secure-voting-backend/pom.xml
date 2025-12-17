@@ -82,15 +82,7 @@
         <!-- liboqs-java for post-quantum cryptography (optional - not in Maven Central) -->
         <!-- To use liboqs, install manually and add to local Maven repository -->
         <!-- See LIBOQS_SETUP.md for installation instructions -->
-        <!--
-        <dependency>
-            <groupId>org.openquantumsafe</groupId>
-            <artifactId>liboqs-java</artifactId>
-            <version>0.3.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/liboqs-java.jar</systemPath>
-        </dependency>
-        -->
+
     </dependencies>
     <build>
         <plugins>
