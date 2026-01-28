@@ -1,0 +1,95 @@
+<div class="split-layout">
+    <!-- Left Side: Animation & Content -->
+    <div class="left-panel">
+        <div class="panel-content">
+            <div class="brand-badge">
+                <i class="fas fa-shield-alt"></i> SecureVote Admin
+            </div>
+
+            <div class="hero-content">
+                <h1>Create <br><span>Election</span></h1>
+                <p>Initialize a secure, blockchain-verified election event. Define the rules, candidates, and timeline.
+                </p>
+            </div>
+            <br>
+            <br>
+            <div class="animation-stage">
+                <div class="voting-card">
+                    <div class="check-mark"><i class="fas fa-vote-yea"></i></div>
+                    <div class="line line-1"></div>
+                    <div class="line line-2"></div>
+                </div>
+                <div class="box-lid"></div>
+                <div class="voting-box">
+                    <div class="slot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Background Abstract Elements -->
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="glass-overlay"></div>
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="right-panel">
+        <div class="form-container">
+            <div class="form-header">
+                <button class="btn-back" (click)="goBack()">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+                
+                <h2>Create New Election</h2>
+                <p>Configure the election parameters below.</p>
+            </div>
+
+            <form (ngSubmit)="onSubmit()" class="registration-form">
+                <!-- Election Name -->
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Election Name</mat-label>
+                    <input matInput [(ngModel)]="electionData.name" name="name" required
+                        placeholder="e.g. Presidential Election 2024">
+                </mat-form-field>
+
+                <!-- Description -->
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Description</mat-label>
+                    <textarea matInput [(ngModel)]="electionData.description" name="description" required rows="3"
+                        placeholder="Brief description of the election..."></textarea>
+                </mat-form-field>
+
+                <div class="form-row">
+                    <!-- Start Date -->
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Start Date & Time</mat-label>
+                        <input matInput type="datetime-local" [(ngModel)]="electionData.startDate" name="startDate"
+                            required>
+                    </mat-form-field>
+
+                    <!-- End Date -->
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>End Date & Time</mat-label>
+                        <input matInput type="datetime-local" [(ngModel)]="electionData.endDate" name="endDate"
+                            required>
+                    </mat-form-field>
+                </div>
+
+                <!-- Rules -->
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Rules & Guidelines</mat-label>
+                    <textarea matInput [(ngModel)]="electionData.rules" name="rules" rows="4"
+                        placeholder="Specific rules or guidelines..."></textarea>
+                </mat-form-field>
+
+                <div class="form-actions">
+                    <button mat-flat-button color="primary" type="submit" [disabled]="isLoading" class="btn-submit-mat">
+                        <span *ngIf="isLoading" class="spinner"></span>
+                        {{ isLoading ? 'Processing...' : 'Create Election' }}
+                        <mat-icon *ngIf="!isLoading">arrow_forward</mat-icon>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

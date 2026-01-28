@@ -1,0 +1,408 @@
+/* Global Vars for Create Election (Indigo Theme) */
+:host {
+    --primary-color: #4f46e5;
+    --primary-dark: #4338ca;
+    --bg-gradient-start: #6366f1;
+    --bg-gradient-end: #312e81;
+    /* Deep Indigo */
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --panel-width: 450px;
+}
+
+.btn-back {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  border-color: #cbd5e1;
+  color: var(--text-primary);
+  transform: translateX(-2px);
+}
+
+.split-layout {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+/* LEFT PANEL (Animation) */
+.left-panel {
+    width: var(--panel-width);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.panel-content {
+    position: relative;
+    z-index: 2;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.brand-badge {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.5px;
+}
+
+.hero-content {
+    margin-top: 80px;
+}
+
+.hero-content h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0 0 20px 0;
+}
+
+.hero-content h1 span {
+    color: #a5b4fc;
+    /* Indigo 300 */
+}
+
+.hero-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    opacity: 0.9;
+    max-width: 320px;
+}
+
+/* ANIMATION STAGE */
+.animation-stage {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
+}
+
+.voting-box {
+    width: 140px;
+    height: 140px;
+    background: #6366f1;
+    /* Indigo 500 */
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.slot {
+    width: 80px;
+    height: 8px;
+    background: #312e81;
+    /* Indigo 900 */
+    border-radius: 4px;
+    margin-top: 20px;
+}
+
+.voting-card {
+    width: 100px;
+    height: 120px;
+    background: white;
+    border-radius: 8px;
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    animation: dropParse 4s ease-in-out infinite;
+}
+
+.check-mark {
+    color: #4f46e5;
+    /* Indigo 600 */
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.line {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    width: 60%;
+    margin-bottom: 6px;
+}
+
+@keyframes dropParse {
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+
+    20% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(100px) scale(0.8);
+        opacity: 0;
+    }
+
+    51% {
+        transform: translateX(-50%) translateY(-100px) scale(0.8);
+        opacity: 0;
+    }
+
+    70% {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.box-lid {
+    width: 150px;
+    height: 20px;
+    background: #4338ca;
+    /* Indigo 700 */
+    border-radius: 4px;
+    position: absolute;
+    top: 30px;
+    /* Adjusted to sit on top of box margin */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Background Abstract Elements */
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.circle-1 {
+    width: 300px;
+    height: 300px;
+    top: -50px;
+    left: -50px;
+}
+
+.circle-2 {
+    width: 200px;
+    height: 200px;
+    bottom: 50px;
+    right: -50px;
+}
+
+.glass-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(50px);
+    z-index: 1;
+    display: none;
+    /* Optional: Hide for sharper look */
+}
+
+/* RIGHT PANEL (Form) */
+.right-panel {
+    flex: 1;
+    margin-left: var(--panel-width);
+    padding: 60px 80px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    position: relative;
+    background: #f8fafc;
+    /* Light grey background for card to pop */
+}
+
+.form-container {
+    width: 100%;
+    max-width: 800px;
+    /* Wider like voter reg */
+    background: white;
+    padding: 40px;
+    border-radius: 24px;
+    /* Neon Indigo Card Effect */
+    box-shadow: 0 0 25px rgba(79, 70, 229, 0.6), 0 0 50px rgba(79, 70, 229, 0.4);
+    border: 2px solid rgba(79, 70, 229, 0.6);
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 5;
+}
+
+.form-header {
+    margin-bottom: 40px;
+}
+
+.btn-back {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.btn-back:hover {
+    color: var(--primary-color);
+}
+
+.form-header h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+}
+
+.form-header p {
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+.registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row>* {
+    flex: 1;
+}
+
+.form-actions {
+    margin-top: 16px;
+}
+
+.btn-submit-mat {
+    width: 100% !important;
+    height: 52px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2) !important;
+}
+
+.btn-submit-mat:hover {
+    background-color: var(--primary-dark) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3) !important;
+}
+
+.btn-submit-mat:disabled {
+    background-color: #cbd5e1 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none !important;
+}
+
+/* Material Field Overrides for Neon/Modern Look */
+::ng-deep .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline {
+    color: #e2e8f0;
+}
+
+::ng-deep .mat-mdc-form-field-appearance-outline.mat-focused .mat-mdc-form-field-outline-thick {
+    color: var(--primary-color);
+}
+
+::ng-deep .mat-mdc-form-field-flex {
+    background-color: #f8fafc;
+    border-radius: 12px;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    :host {
+        --panel-width: 350px;
+    }
+
+    .right-panel {
+        padding: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .left-panel {
+        display: none;
+    }
+
+    .right-panel {
+        margin-left: 0;
+        padding: 24px;
+    }
+}
