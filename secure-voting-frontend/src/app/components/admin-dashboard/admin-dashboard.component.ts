@@ -55,7 +55,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   @ViewChild('electionChart') electionChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('votingChart') votingChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('userModal') userModalRef!: any;
-  
+
   currentUser: any = null;
   elections: Election[] = [];
   users: User[] = [];
@@ -66,21 +66,24 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   selectedFilter = 'all';
   activeSection = 'dashboard'; // 'dashboard', 'elections', 'candidates', 'users', 'blockchain', 'analytics', 'settings'
   selectedElectionForCandidates: number | null = null;
-  
+
   // Statistics
   totalBlocks = 0;
   totalVotes = 0;
   latestBlock: Block | null = null;
-  
+
   // Modal properties
   showElectionModal = false;
   isEditingElection = false;
-  
+
+  // UI Properties
+  isSidebarCollapsed = false; // Initialize to false (expanded) as per user request to show styled sidebar
+
   // User Modal
   showUserModal: boolean = false;
   editingUser: User | null = null;
   isEditMode: boolean = false;
-  
+
   // Vote Modal
   showVoteModal: boolean = false;
   selectedBlock: Block | null = null;
@@ -103,17 +106,17 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     private dataService: DataService,
     private notificationService: NotificationService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Check if user is logged in and is admin
     const user = this.authService.getUser();
     const token = this.authService.getToken();
-    
+
     console.log('Admin Dashboard - Current user:', user);
     console.log('Admin Dashboard - Current token:', token ? 'Token exists' : 'No token');
     console.log('Admin Dashboard - Is admin:', this.isAdmin());
-    
+
     // Temporarily disable redirects for testing
     /*
     if (!user || !token) {
@@ -128,7 +131,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       return;
     }
     */
-    
+
     console.log('Admin Dashboard - Loading data...');
     this.loadUserData();
     this.loadElections();
@@ -158,7 +161,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   loadElections(): void {
     this.isLoading = true;
     this.error = null;
-    
+
     this.dataService.getAllElections().subscribe({
       next: (elections) => {
         this.elections = elections;
@@ -192,11 +195,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
         // Fallback to mock data if API fails
         this.users = [
-          { 
-            voterId: 'VOTER_001', 
-            username: 'john_doe', 
-            email: 'john@example.com', 
-            role: 'USER', 
+          {
+            voterId: 'VOTER_001',
+            username: 'john_doe',
+            email: 'john@example.com',
+            role: 'USER',
             active: true,
             firstName: 'John',
             lastName: 'Doe',
@@ -207,11 +210,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
             bloodGroup: 'O+',
             approvalStatus: 1
           },
-          { 
-            voterId: 'VOTER_002', 
-            username: 'jane_smith', 
-            email: 'jane@example.com', 
-            role: 'USER', 
+          {
+            voterId: 'VOTER_002',
+            username: 'jane_smith',
+            email: 'jane@example.com',
+            role: 'USER',
             active: true,
             firstName: 'Jane',
             lastName: 'Smith',
@@ -222,11 +225,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
             bloodGroup: 'A+',
             approvalStatus: 1
           },
-          { 
-            voterId: 'ADMIN_VOTER_ID', 
-            username: 'admin_user', 
-            email: 'admin@example.com', 
-            role: 'ADMIN', 
+          {
+            voterId: 'ADMIN_VOTER_ID',
+            username: 'admin_user',
+            email: 'admin@example.com',
+            role: 'ADMIN',
             active: true,
             firstName: 'Admin',
             lastName: 'User',
@@ -293,7 +296,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
 
   getElectionStatus(election: Election): string {
     const now = Date.now();
-    
+
     // Calculate status based on timestamp (not just from DB)
     // This ensures we always show the real-time status
     if (now > election.endDate) {
@@ -303,7 +306,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     } else if (now < election.startDate) {
       return 'pending';
     }
-    
+
     // Fallback to DB status if timestamps are invalid
     if (election.status === 'ACTIVE' || election.status === 'OPENED') {
       return 'active';
@@ -324,24 +327,15 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   }
 
   createElection(): void {
-    this.isEditingElection = false;
-    this.currentElection = null;
-    this.electionFormData = {
-      name: '',
-      description: '',
-      rules: '',
-      startDate: '',
-      endDate: '',
-      status: 'SCHEDULED'
-    };
-    this.showElectionModal = true;
+    // Navigate to the new full-page create election component
+    this.router.navigate(['/create-election']);
   }
 
   editElection(election: Election): void {
     console.log('Editing election:', election);
     console.log('Election description:', election.description);
     console.log('Election rules:', election.rules);
-    
+
     this.isEditingElection = true;
     this.currentElection = election;
     this.electionFormData = {
@@ -352,7 +346,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       endDate: this.formatDateForInput(election.endDate),
       status: election.status
     };
-    
+
     console.log('Election form data:', this.electionFormData);
     this.showElectionModal = true;
   }
@@ -440,11 +434,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       }
       console.log('Updating user with ID:', userId);
       const updateRequest = event.user as UpdateUserRequest;
-      
+
       this.dataService.updateUser(userId, updateRequest).subscribe({
         next: (updatedUser) => {
           console.log('User updated successfully:', updatedUser);
-          
+
           // Immediately update the local user with the data we know was saved
           const index = this.users.findIndex(u => (u.voterId || u.username) === userId);
           if (index !== -1) {
@@ -453,33 +447,33 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
             this.users[index] = {
               ...this.users[index],
               ...updatedUser,
-              address: updateRequest.address !== undefined && updateRequest.address !== null && updateRequest.address.trim() !== '' 
-                ? updateRequest.address 
+              address: updateRequest.address !== undefined && updateRequest.address !== null && updateRequest.address.trim() !== ''
+                ? updateRequest.address
                 : (updatedUser.address || this.users[index].address || undefined),
-              wardId: updateRequest.wardId !== undefined && updateRequest.wardId !== null 
-                ? updateRequest.wardId 
+              wardId: updateRequest.wardId !== undefined && updateRequest.wardId !== null
+                ? updateRequest.wardId
                 : (updatedUser.wardId !== undefined ? updatedUser.wardId : this.users[index].wardId),
-              aadharCardLink: updateRequest.aadharCardLink !== undefined && updateRequest.aadharCardLink !== null && updateRequest.aadharCardLink.trim() !== '' 
-                ? updateRequest.aadharCardLink 
+              aadharCardLink: updateRequest.aadharCardLink !== undefined && updateRequest.aadharCardLink !== null && updateRequest.aadharCardLink.trim() !== ''
+                ? updateRequest.aadharCardLink
                 : (updatedUser.aadharCardLink || this.users[index].aadharCardLink || undefined),
-              profilePictureLink: updateRequest.profilePictureLink !== undefined && updateRequest.profilePictureLink !== null && updateRequest.profilePictureLink.trim() !== '' 
-                ? updateRequest.profilePictureLink 
+              profilePictureLink: updateRequest.profilePictureLink !== undefined && updateRequest.profilePictureLink !== null && updateRequest.profilePictureLink.trim() !== ''
+                ? updateRequest.profilePictureLink
                 : (updatedUser.profilePictureLink || this.users[index].profilePictureLink || undefined)
             };
           } else {
             // If not found, reload the entire list
             this.loadUsers();
           }
-          
+
           // Reset loading state before closing
           this.userModalRef?.resetLoadingState();
-          
+
           // Close modal first
           this.closeUserModal();
-          
+
           // Reload users list to get fresh data
           this.loadUsers();
-          
+
           // Show alert after modal is closed
           setTimeout(() => {
             alert('User updated successfully!');
@@ -499,13 +493,13 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       this.dataService.createUser(event.user as CreateUserRequest).subscribe({
         next: (createdUser) => {
           console.log('User created successfully:', createdUser);
-          
+
           // Reset loading state before closing
           this.userModalRef?.resetLoadingState();
-          
+
           this.loadUsers();
           this.closeUserModal();
-          
+
           setTimeout(() => {
             alert('User created successfully!');
           }, 100);
@@ -608,6 +602,10 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     });
   }
 
+  toggleSidebar(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
+
   // Modal control methods
   closeElectionModal(): void {
     this.showElectionModal = false;
@@ -618,9 +616,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
 
   saveElection(): void {
     if (this.isSaving) return;
-    
+
     this.isSaving = true;
-    
+
     const electionData = {
       name: this.electionFormData.name,
       description: this.electionFormData.description,
@@ -677,19 +675,19 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     if (!this.electionFormData.startDate || !this.electionFormData.endDate) {
       return '';
     }
-    
+
     const startDate = new Date(this.electionFormData.startDate);
     const endDate = new Date(this.electionFormData.endDate);
     const durationMs = endDate.getTime() - startDate.getTime();
-    
+
     if (durationMs <= 0) {
       return 'Invalid duration';
     }
-    
+
     const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
     const hours = Math.floor((durationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (days > 0) {
       return `${days} day${days > 1 ? 's' : ''}, ${hours} hour${hours > 1 ? 's' : ''}`;
     } else if (hours > 0) {
@@ -718,10 +716,10 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     // Check if user is logged in
     const user = this.authService.getUser();
     const token = this.authService.getToken();
-    
+
     console.log('Current user:', user);
     console.log('Current token:', token ? 'Token exists' : 'No token');
-    
+
     this.dataService.testBackendConnection().subscribe({
       next: (response) => {
         console.log('Backend test response:', response);
@@ -733,7 +731,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
         console.error('Error status:', error.status);
         console.error('Error statusText:', error.statusText);
         console.error('Error url:', error.url);
-        
+
         let errorMessage = 'Unknown error';
         if (error.status === 0) {
           errorMessage = 'Backend server is not running or not accessible';
@@ -746,7 +744,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
         } else if (error.message) {
           errorMessage = error.message;
         }
-        
+
         alert(`Backend connection failed. Error: ${errorMessage}`);
       }
     });

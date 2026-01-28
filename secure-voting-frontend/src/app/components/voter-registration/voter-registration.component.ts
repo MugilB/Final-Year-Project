@@ -1,17 +1,38 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormGroupDirective } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+
 @Component({
   selector: 'app-voter-registration',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink, HttpClientModule],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    RouterLink,
+    HttpClientModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatIconModule,
+    MatButtonModule
+  ],
   templateUrl: './voter-registration.component.html',
   styleUrls: ['./voter-registration.component.css']
 })
 export class VoterRegistrationComponent implements OnInit {
+  @ViewChild(FormGroupDirective) formGroupDirective!: FormGroupDirective;
   voterForm: FormGroup;
   isLoading = false;
   errorMessage = '';
@@ -23,7 +44,7 @@ export class VoterRegistrationComponent implements OnInit {
 
   get isFormValid(): boolean {
     if (!this.voterForm) return false;
-    
+
     // Use Angular's built-in form validation
     // This checks all validators including required, minLength, pattern, etc.
     return this.voterForm.valid;
@@ -57,7 +78,7 @@ export class VoterRegistrationComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadWards();
-    
+
     // Subscribe to dateOfBirth changes to check eligibility dynamically
     this.voterForm.get('dateOfBirth')?.valueChanges.subscribe((dob: string) => {
       this.checkEligibility(dob);
@@ -68,13 +89,13 @@ export class VoterRegistrationComponent implements OnInit {
     if (!control.value) {
       return null; // Let required validator handle empty values
     }
-    
+
     const value = control.value.toString().trim();
     // Check if the value contains any numbers (0-9)
     if (/\d/.test(value)) {
       return { containsNumbers: true };
     }
-    
+
     return null;
   }
 
@@ -82,20 +103,20 @@ export class VoterRegistrationComponent implements OnInit {
     if (!control.value) {
       return null; // Let required validator handle empty values
     }
-    
+
     const today = new Date();
     const birthDate = new Date(control.value);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     if (age < 18) {
       return { ageIneligible: true };
     }
-    
+
     return null;
   }
 
@@ -105,16 +126,16 @@ export class VoterRegistrationComponent implements OnInit {
       this.ageMessage = '';
       return;
     }
-    
+
     const today = new Date();
     const birthDate = new Date(dob);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     if (age < 18) {
       this.isEligible = false;
       this.ageMessage = `You are ${age} years old. You must be at least 18 years old to register as a voter.`;
@@ -148,7 +169,7 @@ export class VoterRegistrationComponent implements OnInit {
       this.successMessage = '';
 
       const formValue = this.voterForm.value;
-      
+
       // Transform data to match backend expectations
       const wardIdValue = parseInt(formValue.wardId);
       if (isNaN(wardIdValue)) {
@@ -156,11 +177,16 @@ export class VoterRegistrationComponent implements OnInit {
         this.errorMessage = 'Please select a valid ward';
         return;
       }
-      
+
       // Convert date to timestamp (date input returns YYYY-MM-DD format)
       let dobTimestamp: number | null = null;
       if (formValue.dateOfBirth) {
-        const date = new Date(formValue.dateOfBirth + 'T00:00:00');
+        let date: Date;
+        if (formValue.dateOfBirth instanceof Date) {
+          date = formValue.dateOfBirth;
+        } else {
+          date = new Date(formValue.dateOfBirth);
+        }
         dobTimestamp = date.getTime();
         if (isNaN(dobTimestamp)) {
           this.isLoading = false;
@@ -168,7 +194,7 @@ export class VoterRegistrationComponent implements OnInit {
           return;
         }
       }
-      
+
       const voterData = {
         email: formValue.email?.trim(),
         firstName: formValue.firstName?.trim(),
@@ -180,11 +206,11 @@ export class VoterRegistrationComponent implements OnInit {
         wardId: wardIdValue,
         dob: dobTimestamp,
         aadharCardLink: formValue.aadharCardLink?.trim(),
-        profilePictureLink: formValue.profilePictureLink && formValue.profilePictureLink.trim() !== '' 
-          ? formValue.profilePictureLink.trim() 
+        profilePictureLink: formValue.profilePictureLink && formValue.profilePictureLink.trim() !== ''
+          ? formValue.profilePictureLink.trim()
           : null
       };
-      
+
       console.log('Voter Registration Data:', voterData);
 
       const headers = new HttpHeaders({
@@ -196,27 +222,30 @@ export class VoterRegistrationComponent implements OnInit {
           next: (response: any) => {
             this.isLoading = false;
             this.successMessage = response.message || 'Voter registration submitted successfully! Your account will be activated after verification.';
-            
+
             // Reset form after successful submission
             this.voterForm.reset();
+            if (this.formGroupDirective) {
+              this.formGroupDirective.resetForm();
+            }
           },
           error: (error) => {
             this.isLoading = false;
             console.error('Error submitting voter registration:', error);
             console.error('Error details:', error.error);
-            
+
             if (error.error) {
               // Handle validation errors
               if (error.error.validationErrors) {
                 const validationErrors = error.error.validationErrors;
                 const errorMessages: string[] = [];
-                
+
                 // Map backend field names to form field names if needed
                 Object.keys(validationErrors).forEach(field => {
                   const fieldName = this.mapBackendFieldToFormField(field);
                   const errorMsg = validationErrors[field];
                   errorMessages.push(`${this.getFieldDisplayName(fieldName)}: ${errorMsg}`);
-                  
+
                   // Set error on the form control if it exists
                   const formControl = this.voterForm.get(fieldName);
                   if (formControl) {
@@ -224,7 +253,7 @@ export class VoterRegistrationComponent implements OnInit {
                     formControl.markAsTouched();
                   }
                 });
-                
+
                 this.errorMessage = errorMessages.join('; ');
               } else if (error.error.error) {
                 this.errorMessage = error.error.error;

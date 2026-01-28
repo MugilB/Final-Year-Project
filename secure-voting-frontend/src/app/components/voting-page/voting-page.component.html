@@ -1,272 +1,146 @@
-<div class="voting-page">
+<div class="voting-wrapper">
+  <!-- Dynamic Background Elements -->
+  <div class="background-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="glass-grid"></div>
+  </div>
 
-  <!-- Main Content -->
-  <div class="page-content">
-    <div class="container">
-      <!-- Loading State -->
-      <div class="loading-container" *ngIf="isLoading">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">Loading election details...</p>
+  <main class="page-content">
+
+    <!-- Loading State -->
+    <div class="state-container" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading election details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="state-container error" *ngIf="error && !isLoading">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3>Error Loading Election</h3>
+      <p>{{ error }}</p>
+      <button class="btn-primary" (click)="goBack()">Go Back</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="voting-content" *ngIf="!isLoading && !error && election">
+
+      <!-- Header / Hero -->
+      <header class="election-hero">
+        <button class="back-btn" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+
+        <div class="hero-text">
+          <span class="status-pill active">Active Election</span>
+          <h1>{{ election.name }}</h1>
+          <div class="meta-row">
+            <span class="meta-item"><i class="far fa-calendar-alt"></i> Ends: {{ getFormattedDate(election.endDate)
+              }}</span>
+            <span class="meta-item time-remaining"><i class="far fa-clock"></i> {{ getTimeRemaining(election.endDate) }}
+              remaining</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Candidates Grid -->
+      <section class="candidates-section">
+        <div class="section-header">
+          <h2>Cast Your Vote</h2>
+          <p>Select a candidate from the list below. Your vote is secure.</p>
+        </div>
+
+        <div class="candidates-list" *ngIf="candidates.length > 0">
+          <div class="candidate-item" *ngFor="let candidate of candidates"
+            [class.selected]="selectedCandidate?.candidateId === candidate.candidateId"
+            (click)="selectCandidate(candidate)">
+
+            <div class="item-left">
+              <div class="avatar-box-sm">
+                <span class="initial">{{ candidate.name.charAt(0) }}</span>
+              </div>
+
+              <div class="candidate-info-row">
+                <h3 class="name">{{ candidate.name }}</h3>
+                <div class="meta-tags">
+                  <span class="tag party-tag">ID: {{ candidate.partyId }}</span>
+                  <span class="tag ward-tag">Ward {{ candidate.wardId }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="item-right">
+              <div class="check-circle" *ngIf="selectedCandidate?.candidateId === candidate.candidateId">
+                <i class="fas fa-check"></i>
+              </div>
+
+              <button class="select-btn-sm" [class.selected]="selectedCandidate?.candidateId === candidate.candidateId">
+                {{ selectedCandidate?.candidateId === candidate.candidateId ? 'Selected' : 'Select' }}
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="candidates.length === 0">
+          <div class="empty-icon"><i class="fas fa-users-slash"></i></div>
+          <p>No candidates found for this election.</p>
+        </div>
+      </section>
+
+      <!-- Floating Action Footer (Mobile/Desktop) -->
+      <div class="vote-footer" [class.visible]="selectedCandidate">
+        <div class="selection-summary">
+          <span>Voting for:</span>
+          <strong>{{ selectedCandidate?.name }}</strong>
+        </div>
+        <button class="btn-vote-confirm" (click)="openConfirmationCard()">
+          Confirm Vote <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
 
-      <!-- Error State -->
-      <div class="error-container" *ngIf="error && !isLoading">
-        <div class="error-icon">⚠️</div>
-        <h3 class="error-title">Error</h3>
-        <p class="error-text">{{ error }}</p>
-        <button class="btn btn-secondary" (click)="goBack()">Go Back</button>
+    </div>
+  </main>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showConfirmationCard" (click)="closeConfirmationCard()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm Your Vote</h3>
+        <button class="close-icon" (click)="closeConfirmationCard()"><i class="fas fa-times"></i></button>
       </div>
 
-      <!-- Election and Voting Content -->
-      <div class="voting-content" *ngIf="!isLoading && !error && election">
-        <!-- Election Information Card -->
-        <div class="election-info-card">
-          <div class="election-header">
-            <div class="election-title-section">
-              <h2 class="election-title">{{ election.name }}</h2>
-            </div>
-            <div class="election-status">
-              <span class="status-badge eligible">Active Election</span>
-            </div>
-          </div>
-          
-          <div class="election-details">
-            <div class="detail-grid">
-              <div class="detail-item">
-                <span class="detail-label">Start Date</span>
-                <span class="detail-value">{{ getFormattedDate(election.startDate) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">End Date</span>
-                <span class="detail-value">{{ getFormattedDate(election.endDate) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Time Remaining</span>
-                <span class="detail-value time-remaining">{{ getTimeRemaining(election.endDate) }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Total Candidates</span>
-                <span class="detail-value">{{ candidates.length }}</span>
-              </div>
-            </div>
+      <div class="modal-body" *ngIf="selectedCandidate">
+        <div class="confirm-intro">
+          You are about to cast your vote for:
+        </div>
+
+        <div class="candidate-highlight">
+          <div class="lg-avatar">{{ selectedCandidate.name.charAt(0) }}</div>
+          <div class="details">
+            <h4>{{ selectedCandidate.name }}</h4>
+            <p>Party ID: {{ selectedCandidate.partyId }} • Ward: {{ selectedCandidate.wardId }}</p>
           </div>
         </div>
 
-        <!-- Candidates Table Section -->
-        <div class="candidates-section">
-          <!-- <div class="section-header">
-            <h3 class="section-title">Select Your Candidate</h3>
-            <p class="section-subtitle">Choose the candidate you want to vote for in this election</p>
-          </div> -->
-
-          <div class="container gp-main-card" style="padding: 0px !important; height: 100%;" [ngStyle]="{'overflow': 'auto'}">
-            <div class="item">
-              <div class="item" *ngIf="isLoading">
-                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-              </div>
-              <div class="gp-cn-space-around-center" style="overflow: hidden;">
-                <div class="gp-cn-flex-start-stretch sp-max-width" [ngStyle]="{'height': 'auto'}">
-                  <div class="gp-rn-space-between-center" style="padding-top: 24px;" [ngStyle]="{'padding-left': '10px'}">
-                    <!-- <div class="subtitle-font">Candidates</div>
-                    <div class="gp-rn-flex-start-center" style="gap: 10px;">
-                      <div *ngIf="!isLoading">
-                        <span class="candidate-count">{{ candidates.length }} Candidates</span>
-                      </div>
-                    </div> -->
-                  </div>
-                </div>
-              </div>
-              
-              <div *ngIf="candidates && candidates.length > 0 && !isLoading" class="item gp-tktlist-card sp-max-width gp-spacer" style="overflow-x: auto; overflow-y: hidden; height: 100%;">
-                <table matSort matSortDisableClear mat-table [dataSource]="candidates" class="candidates-table" style="width: 100%;border-bottom: 1px solid var(--gp-primary-color-100);" [ngStyle]="{'padding': '0px 10px'}">
-                  <ng-container matColumnDef="select">
-                    <th mat-header-cell *matHeaderCellDef class="select-header-cell">
-                      SELECT
-                    </th>
-                    <td mat-cell *matCellDef="let element" class="select-cell">
-                      <div class="radio-button" [class.checked]="selectedCandidate?.candidateId === element.candidateId" (click)="selectCandidate(element)">
-                        <div class="radio-inner"></div>
-                      </div>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="name">
-                    <th mat-header-cell *matHeaderCellDef class="name-header-cell">
-                      CANDIDATE NAME
-                    </th>
-                    <td mat-cell *matCellDef="let element" class="name-cell">
-                      <span class="candidate-name">{{ element.name }}</span>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="party">
-                    <th mat-header-cell *matHeaderCellDef class="party-header-cell">
-                      PARTY ID
-                    </th>
-                    <td mat-cell *matCellDef="let element" class="party-cell">
-                      <span class="party-id">{{ element.partyId || 'N/A' }}</span>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="ward">
-                    <th mat-header-cell *matHeaderCellDef class="ward-header-cell">
-                      WARD ID
-                    </th>
-                    <td mat-cell *matCellDef="let element" class="ward-cell">
-                      <span class="ward-id">{{ element.wardId || 'N/A' }}</span>
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="actions">
-                    <th mat-header-cell *matHeaderCellDef class="actions-header-cell">
-                      ACTIONS
-                    </th>
-                    <td mat-cell *matCellDef="let element" class="actions-cell">
-                      <button 
-                        class="btn btn-primary btn-sm" 
-                        [class.selected]="selectedCandidate?.candidateId === element.candidateId"
-                        (click)="selectCandidate(element)"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
-                          <path d="M2 6h20v2H2V6zm0 4h20v2H2v-2zm0 4h20v2H2v-2zm0 4h20v2H2v-2z"/>
-                          <path d="M4 8h2v2H4V8zm0 4h2v2H4v-2zm0 4h2v2H4v-2z"/>
-                        </svg>
-                        {{ selectedCandidate?.candidateId === element.candidateId ? 'Selected' : 'Vote' }}
-                      </button>
-                    </td>
-                  </ng-container>
-
-                  <tr class="gp-table-header" mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                  <tr class="gp-table-row" mat-row *matRowDef="let row; columns: displayedColumns;" [class.selected-row]="selectedCandidate?.candidateId === row.candidateId"></tr>
-                </table>
-              </div>
-
-              <div class="gp-cn-center-center gp-main-card" *ngIf="!isLoading && candidates && candidates.length === 0" style="margin-top:50px !important;width: 250px; height: 250px; border-radius: 50%; background-color: var(--gp-primary-color-25) !important; margin: auto;">
-                <div class="item">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="125" height="125" viewBox="0 0 169 169" fill="none">
-                    <path d="M0 0H169V39.5723V65.4125V103.736V128.943V169H0V128.961V103.328V65.1921V39.6295V0ZM10.7542 39.9636C10.3211 40.2917 10.0783 40.6915 9.99914 41.2299C9.86075 42.1714 9.9323 43.2002 9.94171 44.1527L9.9795 48.7548L9.97669 55.9828C9.97414 57.2514 9.9134 58.5485 9.98429 59.8142C11.3672 60.4836 12.7627 61.1336 14.0747 61.9369C19.5212 65.217 23.6575 70.289 25.7751 76.284C27.9589 82.5699 27.5971 89.8803 24.6878 95.8885C22.4921 100.532 18.9099 104.38 14.4351 106.902C13.8137 107.258 10.2522 108.769 10.1151 109.054C9.78162 109.745 9.96011 117.316 9.96168 118.579C9.96382 120.389 9.75216 126.607 10.1427 127.805C10.2428 128.112 10.3985 128.416 10.6942 128.573C11.0476 128.76 11.7316 128.792 12.1371 128.815C14.1528 128.925 16.2139 128.839 18.2338 128.834L30.1683 128.828C32.2311 128.829 34.3269 128.758 36.3857 128.848C36.2229 126.07 36.4176 123.188 36.4114 120.4C36.4067 118.25 36.1188 114.666 36.4585 112.686C36.6224 111.731 37.015 110.857 37.6665 110.134C38.5848 109.114 39.8205 108.634 41.1718 108.576C41.8565 108.547 42.54 108.657 43.1816 108.898C43.8231 109.139 44.4095 109.507 44.9059 109.98C46.0183 111.026 46.355 112.324 46.3856 113.81C46.445 116.704 46.3827 119.606 46.3822 122.501C46.3818 124.561 46.5041 126.706 46.3251 128.757C48.238 128.88 50.1614 128.839 52.0774 128.839L130.054 128.833C138.802 128.845 147.556 128.957 156.303 128.86C156.889 128.853 157.922 128.915 158.404 128.56C158.652 128.239 158.798 127.998 158.858 127.592C159.022 126.479 158.951 125.27 158.98 124.143C159.055 121.09 159.06 118.035 158.992 114.981C158.965 112.953 159.108 110.833 158.924 108.818C158.264 108.663 157.63 108.389 157.002 108.135C152.409 106.275 148.301 102.529 145.692 98.3402C141.933 92.3022 140.958 84.6576 142.609 77.7885C143.4 74.5152 144.837 71.4325 146.834 68.7209C148.831 66.0093 151.349 63.7232 154.241 61.9963C155.77 61.0655 157.337 60.304 159.009 59.6646C159.12 56.1154 159.052 52.5463 159.054 48.9942C159.056 46.6081 159.183 44.132 159.016 41.7541C158.98 41.2275 158.908 40.6718 158.716 40.1778C158.395 39.9393 157.561 39.948 157.16 39.9331C154.455 39.8325 151.715 39.9225 149.006 39.9229L55.9883 39.9301C52.7608 39.9303 49.5015 40.0358 46.2782 39.9231C46.3187 43.4602 46.3276 46.9975 46.3048 50.5347C46.3092 52.5254 46.5944 55.1684 46.1416 57.0782C45.9611 57.8396 45.5138 58.5279 44.9748 59.087C44.1268 59.9667 42.985 60.6035 41.7424 60.6335C40.2033 60.6706 38.7144 60.0038 37.6367 58.9231C37.0761 58.3609 36.6734 57.7081 36.4892 56.9329C36.0459 55.0668 36.2599 52.8187 36.2562 50.8981C36.2429 47.6272 36.2502 44.3562 36.2783 41.0854L36.2899 39.9281L20.3266 39.9248C17.1389 39.9236 13.9406 39.8707 10.7542 39.9636ZM0 128.961V169H169V128.943C168.791 129.59 168.658 130.267 168.461 130.921C167.555 133.872 165.517 136.345 162.794 137.799C161.053 138.728 159.337 139.013 157.381 139.078C153.926 139.193 150.426 139.076 146.966 139.067L128.008 139.047L22.9512 139.088C20.8021 139.069 18.653 139.065 16.5039 139.076C14.1439 139.087 10.708 139.386 8.48961 138.695C5.16415 137.659 2.22603 135.037 0.919086 131.789C0.579948 130.946 0.497053 129.844 0.0656158 129.073C0.0444218 129.035 0.021872 128.998 0 128.961ZM0 0V39.6295C0.346193 39.024 0.391252 38.1503 0.567977 37.4706C0.677655 37.0488 0.881985 36.6276 1.06559 36.2326C2.24565 33.6942 4.53099 31.5128 7.18256 30.566C8.38126 30.1379 9.71527 29.9192 10.9848 29.8741C14.387 29.7532 17.8293 29.8617 21.2351 29.8637L133.23 29.8561C138.472 29.8197 143.715 29.8237 148.957 29.8682C152 29.8697 155.075 29.7728 158.114 29.9079C159.712 29.979 161.221 30.2899 162.668 30.9867C165.22 32.2155 167.356 34.5024 168.342 37.169C168.62 37.9206 168.704 38.7353 168.971 39.4931C168.98 39.5196 168.99 39.5459 169 39.5723V0H0ZM0 65.1921V103.328C0.436224 102.648 0.704671 101.955 1.25346 101.333C2.63231 99.7711 4.37501 99.941 6.22534 99.493C7.32702 99.2264 8.46403 98.7635 9.45476 98.2131C13.0123 96.2376 15.5518 92.7429 16.6358 88.8554C17.817 84.6188 17.2041 80.3063 15.0283 76.4884C13.1761 73.2384 10.0169 70.3768 6.35538 69.3842C5.22009 69.0764 4.01741 69.1096 2.90229 68.7817C1.72739 68.4362 0.739333 67.6976 0.395983 66.4866C0.273627 66.0552 0.219187 65.5865 0 65.1921ZM169 103.736V65.4125C168.719 65.8509 168.537 66.3345 168.267 66.7765C167.524 67.9934 166.285 68.7384 164.916 69.0531C163.932 69.2791 162.936 69.4139 161.973 69.7291C158.904 70.7335 156.118 73.0682 154.397 75.7788C153.239 77.5701 152.447 79.5725 152.066 81.6709C151.685 83.7693 151.722 85.9224 152.176 88.0063C153.084 92.0274 155.471 95.6797 158.99 97.897C160.163 98.646 161.456 99.187 162.813 99.4963C163.702 99.7034 164.629 99.7768 165.51 100.007C167.269 100.467 168.291 101.851 168.881 103.484C168.941 103.649 168.911 103.582 169 103.736Z" fill="#6C7385"/>
-                    <path d="M40.8078 69.8367C42.0374 69.7359 43.2595 70.0098 44.279 70.7177C45.3213 71.4557 46.0286 72.5768 46.246 73.8353C46.4785 75.1245 46.2243 76.4449 45.4715 77.5269C44.6347 78.7294 43.4882 79.3731 42.0605 79.6216C40.8212 79.7549 39.5849 79.5648 38.5421 78.8458C37.4503 78.0932 36.6411 76.8611 36.4344 75.5499C36.2262 74.2557 36.5328 72.9315 37.2887 71.8606C38.1728 70.6253 39.338 70.0718 40.8078 69.8367Z" fill="#6C7385"/>
-                    <path d="M40.2665 89.2358C41.6517 89.0906 42.9475 89.2193 44.1379 89.995C44.6845 90.349 45.1558 90.8074 45.5248 91.3439C45.8938 91.8805 46.1532 92.4846 46.2882 93.1216C46.5498 94.4032 46.2685 95.7004 45.551 96.7872C44.8248 97.8871 43.6766 98.7297 42.3797 98.9987C41.0809 99.1538 39.8747 99.0243 38.7299 98.3501C37.6156 97.694 36.7699 96.6328 36.4637 95.3678C36.1495 94.0681 36.3353 92.6381 37.0385 91.4944C37.7851 90.2797 38.8977 89.5659 40.2665 89.2358Z" fill="#6C7385"/>
-                    <path d="M97.902 49.048C97.9235 49.0464 97.9449 49.0445 97.9664 49.0433C106.639 48.5575 115.642 51.5093 122.181 57.2585C125.795 60.3779 128.753 64.1853 130.882 68.459C133.011 72.7326 134.268 77.3871 134.581 82.1513C134.878 86.873 134.232 91.6066 132.681 96.0761C131.13 100.546 128.704 104.662 125.546 108.184C122.536 111.589 118.884 114.366 114.798 116.356C110.712 118.346 106.274 119.51 101.738 119.78C92.7379 120.021 85.0331 117.815 78.0177 112.048C70.6183 105.965 65.7592 97.5793 64.8605 87.965C63.9858 78.4904 66.8963 69.0547 72.9563 61.7192C73.6084 60.942 74.3554 60.228 75.0702 59.5088C80.0985 54.3964 86.5609 50.9315 93.6019 49.5729C95.0295 49.302 96.4563 49.1718 97.902 49.048ZM120.32 70.026C117.986 72.5505 115.446 74.9169 113.02 77.3535L102.434 88.0731C100.609 89.8927 98.8386 91.7667 97.0306 93.6036C95.9933 94.659 94.9057 95.6616 93.8635 96.7112C91.0845 99.5685 88.2706 102.392 85.4226 105.18C87.3568 106.395 89.2506 107.412 91.4102 108.192C97.9507 110.317 104.683 110.159 110.886 107.015C116.775 104.031 121.385 98.4474 123.416 92.2024C125.09 86.912 125.048 81.228 123.297 75.9626C122.859 74.6828 122.247 73.4036 121.633 72.1982C121.307 71.5585 120.856 70.4833 120.32 70.026ZM99.1588 59.2023C92.1949 59.6361 85.7592 62.2187 81.0759 67.5349C78.8105 70.0941 77.0754 73.0774 75.9711 76.3119C74.8668 79.5464 74.4153 82.9679 74.6425 86.3781C74.889 90.3927 76.1528 94.5014 78.4033 97.8525C80.0288 95.9884 81.9221 94.2299 83.702 92.5077L104.49 71.7026C106.255 69.9133 108.032 68.1352 109.82 66.3685C110.908 65.2962 112.148 64.2391 113.1 63.051L113.095 62.9082C112.536 62.4028 111.637 62.0837 110.951 61.7674C107.279 60.0754 103.369 58.9989 99.2933 59.1955L99.1588 59.2023Z" fill="#6C7385"/>
-                  </svg>
-                </div>
-                <div class="gp-cn-flex-start-center" style="gap: 15px;">
-                  <div class="item help-heading">
-                    No Candidates!
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="warning-box">
+          <i class="fas fa-exclamation-circle"></i>
+          <p>This action cannot be undone. Please confirm your choice.</p>
         </div>
+      </div>
 
-        <!-- Voting Actions -->
-        <div class="voting-actions">
-          <div class="action-buttons">
-            <button 
-              class="btn btn-secondary" 
-              (click)="goBack()"
-              [disabled]="isSubmitting"
-            >
-              Cancel
-            </button>
-            <button 
-              class="btn btn-primary submit-vote-btn" 
-              (click)="openConfirmationCard()"
-              [disabled]="!selectedCandidate || isSubmitting"
-            >
-              <span class="submit-content">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
-                  <path d="M2 6h20v2H2V6zm0 4h20v2H2v-2zm0 4h20v2H2v-2zm0 4h20v2H2v-2z"/>
-                  <path d="M4 8h2v2H4V8zm0 4h2v2H4v-2zm0 4h2v2H4v-2z"/>
-                </svg>
-                Submit Vote
-              </span>
-            </button>
-          </div>
-        </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeConfirmationCard()" [disabled]="isSubmitting">Cancel</button>
+        <button class="btn-confirm" (click)="confirmVote()" [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">Submit Vote</span>
+          <span *ngIf="isSubmitting"><i class="fas fa-spinner fa-spin"></i> Submitting...</span>
+        </button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Confirmation Card Modal -->
-<div class="confirmation-overlay" *ngIf="showConfirmationCard" (click)="closeConfirmationCard()">
-  <div class="confirmation-card" (click)="$event.stopPropagation()">
-    <div class="confirmation-header">
-      <h3 class="confirmation-title">Confirm Your Vote</h3>
-      <button class="close-button" (click)="closeConfirmationCard()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
-      </button>
-    </div>
-    
-    <div class="confirmation-content" *ngIf="selectedCandidate">
-      <div class="candidate-details">
-        <div class="candidate-info-section">
-          <h4 class="section-title">Candidate Information</h4>
-          <div class="detail-row">
-            <span class="detail-label">Name:</span>
-            <span class="detail-value">{{ selectedCandidate.name }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Party ID:</span>
-            <span class="detail-value">{{ selectedCandidate.partyId || 'N/A' }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Ward ID:</span>
-            <span class="detail-value">{{ selectedCandidate.wardId || 'N/A' }}</span>
-          </div>
-        </div>
-        
-        <div class="election-info-section">
-          <h4 class="section-title">Election Details</h4>
-          <div class="detail-row">
-            <span class="detail-label">Election:</span>
-            <span class="detail-value">{{ election?.name }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">End Date:</span>
-            <span class="detail-value">{{ getElectionEndDate() }}</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="confirmation-warning">
-        <div class="warning-icon">⚠️</div>
-        <p class="warning-text">
-          Please review your selection carefully. Once confirmed, your vote cannot be changed.
-        </p>
-      </div>
-    </div>
-    
-    <div class="confirmation-actions">
-      <button 
-        class="btn btn-secondary" 
-        (click)="closeConfirmationCard()"
-        [disabled]="isSubmitting"
-      >
-        Cancel
-      </button>
-      <button 
-        class="btn btn-primary confirm-vote-btn" 
-        (click)="confirmVote()"
-        [disabled]="isSubmitting"
-        [class.loading]="isSubmitting"
-      >
-        <span *ngIf="!isSubmitting" class="confirm-content">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
-            <path d="M2 6h20v2H2V6zm0 4h20v2H2v-2zm0 4h20v2H2v-2zm0 4h20v2H2v-2z"/>
-            <path d="M4 8h2v2H4V8zm0 4h2v2H4v-2zm0 4h2v2H4v-2z"/>
-          </svg>
-          Confirm Vote
-        </span>
-        <span *ngIf="isSubmitting" class="loading-content">
-          <div class="spinner-small"></div>
-          Submitting Vote...
-        </span>
-      </button>
-    </div>
-  </div>
 </div>

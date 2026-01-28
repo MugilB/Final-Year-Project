@@ -1,87 +1,102 @@
-<div class="signin-container">
-  <div class="signin-card">
-    <div class="signin-header">
-      <h2>Sign In</h2>
-      <p>Welcome back! Please sign in to your account.</p>
-    </div>
+<div class="split-layout">
+  <!-- LEFT PANEL: Branding & Animation -->
+  <div class="left-panel">
+    <div class="panel-content">
+      <div class="brand-badge">
+        <i class="fas fa-vote-yea"></i> SecureVote
+      </div>
 
-    <form [formGroup]="signinForm" (ngSubmit)="onSubmit()" class="signin-form">
-      <div class="form-group">
-        <label for="username">Voter ID</label>
-        <input
-          type="text"
-          id="username"
-          formControlName="username"
-          class="form-control"
-          [class.error]="getFieldError('username')"
-          placeholder="Enter your Voter ID"
-        />
-        <div class="error-message" *ngIf="getFieldError('username')">
-          {{ getFieldError('username') }}
+      <div class="hero-content">
+        <h1>Welcome<br><span>Back.</span></h1>
+        <p>Access your secure voting dashboard to participate in upcoming elections.</p>
+      </div>
+
+      <!-- Animation Stage (Voting Box - Blue Theme) -->
+      <div class="animation-stage">
+        <div class="voting-box">
+          <div class="slot"></div>
+          <div class="voting-card">
+            <i class="fas fa-user-check check-mark"></i>
+            <div class="line"></div>
+            <div class="line" style="width: 40%"></div>
+          </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="password-input-wrapper">
-        <input
-            [type]="showPassword ? 'text' : 'password'"
-          id="password"
-          formControlName="password"
-          class="form-control"
-          [class.error]="getFieldError('password')"
-          placeholder="Enter your password"
-        />
-          <button type="button" class="password-toggle-btn" (click)="togglePasswordVisibility()">
-            <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+      <!-- Background Circles -->
+      <div class="circle circle-1"></div>
+      <div class="circle circle-2"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: Sign In Form -->
+  <div class="right-panel">
+    <div class="glass-grid"></div>
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Sign In</h2>
+        <p>Enter your credentials to continue</p>
+      </div>
+
+      <form [formGroup]="signinForm" (ngSubmit)="onSubmit()" class="signin-form">
+        <div class="form-group">
+          <label for="username">Voter ID</label>
+          <div class="input-with-icon">
+            <i class="fas fa-id-card input-icon"></i>
+            <input type="text" id="username" formControlName="username" class="form-control"
+              [class.error]="getFieldError('username')" placeholder="Enter Voter ID" />
+          </div>
+          <div class="error-message" *ngIf="getFieldError('username')">
+            {{ getFieldError('username') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-with-icon">
+            <i class="fas fa-lock input-icon"></i>
+            <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
+              class="form-control" [class.error]="getFieldError('password')" placeholder="Enter Password" />
+            <button type="button" class="password-toggle-btn" (click)="togglePasswordVisibility()">
+              <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="getFieldError('password')">
+            {{ getFieldError('password') }}
+          </div>
+        </div>
+
+        <div class="general-error" *ngIf="errorMessage">
+          <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading || signinForm.invalid">
+            <span *ngIf="isLoading" class="spinner"></span>
+            {{ isLoading ? 'Verifying...' : 'Sign In To Dashboard' }}
           </button>
         </div>
-        <div class="error-message" *ngIf="getFieldError('password')">
-          {{ getFieldError('password') }}
-        </div>
+      </form>
+
+      <div class="divider">
+        <span>New to Secure Vote?</span>
       </div>
 
-      <div class="error-message general-error" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
-
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="isLoading || signinForm.invalid"
-      >
-        <span *ngIf="isLoading" class="spinner"></span>
-        {{ isLoading ? 'Signing In...' : 'Sign In' }}
-      </button>
-    </form>
-
-    <!-- <div class="signin-footer">
-      <p>Don't have an account? <a routerLink="/signup">Sign up here</a></p>
-    </div> -->
-
-    <!-- Registration Options -->
-    <div class="registration-options">
-      <!-- <div class="divider">
-        <span>or</span>
-      </div> -->
-      
       <div class="registration-buttons">
-        <button 
-          type="button" 
-          class="btn btn-registration btn-voter"
-          (click)="openVoterRegistration()"
-        >
-          <i class="fas fa-user-plus"></i>
-          New Voter Registration
+        <button type="button" class="btn-reg btn-voter" (click)="openVoterRegistration()">
+          <div class="icon-box"><i class="fas fa-user-plus"></i></div>
+          <div class="btn-content">
+            <span class="btn-label">Voter Registration</span>
+            <span class="btn-desc">Create new account</span>
+          </div>
         </button>
-        
-        <button 
-          type="button" 
-          class="btn btn-registration btn-candidate"
-          (click)="openCandidateNomination()"
-        >
-          <i class="fas fa-user-tie"></i>
-          Candidate Nomination
+
+        <button type="button" class="btn-reg btn-candidate" (click)="openCandidateNomination()">
+          <div class="icon-box"><i class="fas fa-user-tie"></i></div>
+          <div class="btn-content">
+            <span class="btn-label">Candidate Nomination</span>
+            <span class="btn-desc">Apply for candidacy</span>
+          </div>
         </button>
       </div>
     </div>

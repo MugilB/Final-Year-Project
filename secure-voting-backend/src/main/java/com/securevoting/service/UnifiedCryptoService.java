@@ -64,7 +64,7 @@ public class UnifiedCryptoService {
     @Autowired
     private QKDService qkdService;
 
-    @Autowired(required = false)
+    @Autowired
     private LiboqsCryptoService liboqsCryptoService;
 
     @Autowired
@@ -73,12 +73,20 @@ public class UnifiedCryptoService {
     @PostConstruct
     public void init() {
         Security.addProvider(new BouncyCastleProvider());
-        System.out.println("qq.java initialized - Quantum enabled: " + quantumCryptoEnabled +
-                ", Mode: " + quantumCryptoMode + ", Integrity enabled: " + integrityEnabled);
-        if (quantumCryptoEnabled && "liboqs".equals(quantumCryptoMode) && liboqsCryptoService == null) {
-            System.out.println("WARNING: liboqs mode enabled but LiboqsCryptoService not available. " +
-                    "Please install liboqs library. Falling back to BB84 or ECDH.");
+        System.out.println("=== UnifiedCryptoService Initialized ===");
+        System.out.println("Quantum Crypto Enabled: " + quantumCryptoEnabled);
+        System.out.println("Crypto Mode: " + quantumCryptoMode);
+        System.out.println("Integrity Enabled: " + integrityEnabled);
+        
+        if (quantumCryptoEnabled && "liboqs".equals(quantumCryptoMode)) {
+            if (liboqsCryptoService != null && liboqsCryptoService.isInitialized()) {
+                System.out.println("Post-Quantum KEM: " + liboqsCryptoService.getAlgorithmInfo());
+            } else {
+                System.out.println("WARNING: liboqs mode enabled but LiboqsCryptoService not initialized. " +
+                        "Falling back to BB84 or ECDH.");
+            }
         }
+        System.out.println("=========================================");
     }
 
     /**
@@ -94,7 +102,7 @@ public class UnifiedCryptoService {
 
         try {
             if (quantumCryptoEnabled) {
-                if ("liboqs".equals(quantumCryptoMode) && liboqsCryptoService != null) {
+                if ("liboqs".equals(quantumCryptoMode) && liboqsCryptoService != null && liboqsCryptoService.isInitialized()) {
                     return encryptWithLiboqs(voteJson);
                 } else {
                     return encryptWithQKD(voteJson);
@@ -104,7 +112,7 @@ public class UnifiedCryptoService {
             }
         } catch (Exception e) {
             if (quantumCryptoEnabled && quantumFallbackEnabled) {
-                System.out.println("WARNING: Quantum encryption failed, falling back to ECDH: " + e.getMessage());
+                System.out.println("WARNING: Quantum/Post-quantum encryption failed, falling back to ECDH: " + e.getMessage());
                 return encryptWithECDH(voteJson);
             }
             throw e;
@@ -194,13 +202,14 @@ public class UnifiedCryptoService {
     }
 
     private String encryptWithLiboqs(String voteJson) throws Exception {
-        System.out.println("Encrypting vote using liboqs KEM");
+        System.out.println("Encrypting vote using Post-Quantum Kyber KEM (BouncyCastle)");
 
-        if (liboqsCryptoService == null) {
+        if (liboqsCryptoService == null || !liboqsCryptoService.isInitialized()) {
             throw new UnsupportedOperationException(
-                    "LiboqsCryptoService not available. Please install liboqs library. " +
-                            "See LIBOQS_SETUP.md for instructions.");
+                    "LiboqsCryptoService not available or not initialized. Check startup logs for errors.");
         }
+        
+        System.out.println("Using algorithm: " + liboqsCryptoService.getCurrentAlgorithm());
 
         // Step 1: Generate shared secret using liboqs KEM
         LiboqsCryptoService.LiboqsResult liboqsResult = liboqsCryptoService.encapsulate();
@@ -246,7 +255,7 @@ public class UnifiedCryptoService {
         payload.setHmac(hmac);
 
         String jsonResult = gson.toJson(payload);
-        System.out.println("liboqs KEM encryption completed. Payload size: " + jsonResult.length() + " bytes");
+        System.out.println("Post-Quantum Kyber KEM encryption completed. Payload size: " + jsonResult.length() + " bytes");
 
         return jsonResult;
     }
@@ -333,12 +342,14 @@ public class UnifiedCryptoService {
     }
 
     private String decryptWithLiboqs(VotePayload payload) throws Exception {
-        System.out.println("Decrypting vote using liboqs KEM");
+        System.out.println("Decrypting vote using Liboqs Post-Quantum Kyber KEM (BouncyCastle)");
 
-        if (liboqsCryptoService == null) {
+        if (liboqsCryptoService == null || !liboqsCryptoService.isInitialized()) {
             throw new UnsupportedOperationException(
-                    "LiboqsCryptoService not available. Please install liboqs library.");
+                    "LiboqsCryptoService not available or not initialized. Check startup logs for errors.");
         }
+        
+        System.out.println("Using algorithm: " + liboqsCryptoService.getCurrentAlgorithm());
 
         // Step 1: Extract liboqs metadata
         Gson gson = new Gson();
@@ -376,7 +387,7 @@ public class UnifiedCryptoService {
         byte[] decryptedVote = aesCipher.doFinal(cipherText);
 
         String voteJson = new String(decryptedVote, StandardCharsets.UTF_8);
-        System.out.println("liboqs KEM decryption completed successfully");
+        System.out.println("Liboqs: Post-Quantum Kyber KEM decryption completed successfully");
 
         return voteJson;
     }
@@ -500,3 +511,4 @@ public class UnifiedCryptoService {
         return result == 0;
     }
 }
+

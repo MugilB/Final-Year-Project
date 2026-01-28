@@ -27,7 +27,7 @@ export class VotingComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Check if electionId is provided in route
@@ -46,7 +46,7 @@ export class VotingComponent implements OnInit {
   loadElections() {
     this.isLoading = true;
     this.error = null;
-    
+
     this.dataService.getAllElections().subscribe({
       next: (elections) => {
         this.elections = elections;
@@ -62,7 +62,7 @@ export class VotingComponent implements OnInit {
   loadElectionsAndDetails(electionId: number) {
     this.isLoading = true;
     this.error = null;
-    
+
     this.dataService.getAllElections().subscribe({
       next: (elections) => {
         this.elections = elections;
@@ -85,10 +85,10 @@ export class VotingComponent implements OnInit {
 
   loadCandidates() {
     if (!this.selectedElectionId) return;
-    
+
     this.isLoading = true;
     this.error = null;
-    
+
     this.dataService.getApprovedCandidatesByElection(this.selectedElectionId).subscribe({
       next: (candidates) => {
         this.candidates = candidates;
@@ -101,9 +101,33 @@ export class VotingComponent implements OnInit {
     });
   }
 
-  submitVote() {
+  showConfirmationCard: boolean = false;
+
+  getSelectedCandidate(): Candidate | undefined {
+    return this.candidates.find(c => c.candidateId === this.selectedCandidateId);
+  }
+
+  get selectedCandidateName(): string {
+    const candidate = this.getSelectedCandidate();
+    return candidate ? candidate.name : '';
+  }
+
+  openConfirmationCard() {
+    if (!this.selectedCandidateId) {
+      this.error = 'Please select a candidate';
+      return;
+    }
+    this.showConfirmationCard = true;
+  }
+
+  closeConfirmationCard() {
+    this.showConfirmationCard = false;
+  }
+
+  confirmVote() {
     if (!this.selectedElectionId || !this.selectedCandidateId) {
       this.error = 'Please select a candidate';
+      this.closeConfirmationCard();
       return;
     }
 
@@ -119,13 +143,13 @@ export class VotingComponent implements OnInit {
     this.dataService.submitVote(voteData).subscribe({
       next: (response) => {
         this.success = 'Vote submitted successfully! Your vote has been encrypted and stored securely.';
-        this.resetForm();
         this.isLoading = false;
-        
+        this.closeConfirmationCard();
+
         // Notify dashboard to refresh voting status
         console.log('=== Vote submitted successfully, notifying dashboard ===');
         this.notificationService.notifyElectionUpdated();
-        
+
         // Navigate back to dashboard after a short delay
         setTimeout(() => {
           this.router.navigate(['/dashboard']);
@@ -134,6 +158,7 @@ export class VotingComponent implements OnInit {
       error: (error) => {
         this.error = error.error?.message || 'Failed to submit vote. Please try again.';
         this.isLoading = false;
+        this.closeConfirmationCard();
       }
     });
   }
@@ -142,6 +167,7 @@ export class VotingComponent implements OnInit {
     this.selectedElectionId = null;
     this.selectedCandidateId = null;
     this.candidates = [];
+    this.showConfirmationCard = false;
   }
 
 
@@ -158,7 +184,7 @@ export class VotingComponent implements OnInit {
   getPartyName(partyId?: number): string {
     // For now, return a simple mapping or you can implement a proper party service
     if (!partyId) return 'Independent';
-    
+
     // Simple mapping - you can enhance this with a proper party service
     const partyMap: { [key: number]: string } = {
       1: 'Democratic Party',
@@ -166,13 +192,13 @@ export class VotingComponent implements OnInit {
       3: 'Green Party',
       4: 'Libertarian Party'
     };
-    
+
     return partyMap[partyId] || `Party ${partyId}`;
   }
 
   viewCandidateDetails(candidate: Candidate, event: Event): void {
     event.stopPropagation(); // Prevent row selection when clicking details button
-    
+
     // For now, just show an alert with candidate details
     // You can enhance this to show a modal or navigate to a details page
     const details = `
@@ -181,7 +207,7 @@ export class VotingComponent implements OnInit {
       ${candidate.candidateDetails?.biography ? `Bio: ${candidate.candidateDetails.biography}` : ''}
       ${candidate.candidateDetails?.manifestoSummary ? `Manifesto: ${candidate.candidateDetails.manifestoSummary}` : ''}
     `.trim();
-    
+
     alert(details);
   }
 
@@ -191,7 +217,7 @@ export class VotingComponent implements OnInit {
 
   formatDate(dateValue: string | number): string {
     if (!dateValue) return 'N/A';
-    
+
     try {
       // Handle both string and number (timestamp) formats
       const date = typeof dateValue === 'number' ? new Date(dateValue) : new Date(dateValue);
@@ -210,21 +236,21 @@ export class VotingComponent implements OnInit {
 
   getTimeRemaining(endDateValue: string | number): string {
     if (!endDateValue) return 'N/A';
-    
+
     try {
       // Handle both string and number (timestamp) formats
       const endDate = typeof endDateValue === 'number' ? new Date(endDateValue) : new Date(endDateValue);
       const now = new Date();
       const diff = endDate.getTime() - now.getTime();
-      
+
       if (diff <= 0) {
         return 'Election Ended';
       }
-      
+
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      
+
       if (days > 0) {
         return `${days}d ${hours}h ${minutes}m remaining`;
       } else if (hours > 0) {

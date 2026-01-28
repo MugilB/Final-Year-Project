@@ -33,10 +33,17 @@
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- BouncyCastle Core Provider (with PQC support) -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.70</version>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.77</version>
+        </dependency>
+        <!-- BouncyCastle PKIX/CMS/EAC/PKCS/OCSP/TSP/OPENSSL -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.77</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

@@ -1,246 +1,157 @@
-<div class="registration-container">
-  <div class="registration-card">
-    <div class="registration-header">
-      <button class="btn-back" (click)="goBack()">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h2>New Voter Registration</h2>
-      <p>Fill out the form below to register as a new voter</p>
+<div class="split-layout">
+  <!-- Left Side: Animation & Content -->
+  <div class="left-panel">
+    <div class="panel-content">
+      <div class="brand-badge">
+        <i class="fas fa-shield-alt"></i> SecureVote
+      </div>
+
+      <div class="hero-content">
+        <h1>Empower Your <br><span>Voice</span></h1>
+        <p>Register today to participate in the upcoming secure elections. Your vote helps shape the future.</p>
+      </div>
+      <br>
+      <br>
+      <div class="animation-stage">
+        <div class="voting-card">
+          <div class="check-mark"><i class="fas fa-check"></i></div>
+          <div class="line line-1"></div>
+          <div class="line line-2"></div>
+        </div>
+        <div class="box-lid"></div>
+        <div class="voting-box">
+          <div class="slot"></div>
+        </div>
+      </div>
     </div>
 
-    <form [formGroup]="voterForm" (ngSubmit)="onSubmit()" class="registration-form">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="firstName">First Name *</label>
-          <input
-            type="text"
-            id="firstName"
-            formControlName="firstName"
-            class="form-control"
-            [class.error]="getFieldError('firstName')"
-            placeholder="Enter your first name"
-          />
-          <div class="error-message" *ngIf="getFieldError('firstName')">
-            {{ getFieldError('firstName') }}
-          </div>
-        </div>
+    <!-- Background Abstract Elements -->
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="glass-overlay"></div>
+  </div>
 
-        <div class="form-group">
-          <label for="lastName">Last Name *</label>
-          <input
-            type="text"
-            id="lastName"
-            formControlName="lastName"
-            class="form-control"
-            [class.error]="getFieldError('lastName')"
-            placeholder="Enter your last name"
-          />
-          <div class="error-message" *ngIf="getFieldError('lastName')">
-            {{ getFieldError('lastName') }}
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="email">Email Address *</label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            class="form-control"
-            [class.error]="getFieldError('email')"
-            placeholder="Enter your email address"
-          />
-          <div class="error-message" *ngIf="getFieldError('email')">
-            {{ getFieldError('email') }}
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="phoneNumber">Phone Number *</label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            formControlName="phoneNumber"
-            class="form-control"
-            [class.error]="getFieldError('phoneNumber')"
-            placeholder="Enter your phone number"
-          />
-          <div class="error-message" *ngIf="getFieldError('phoneNumber')">
-            {{ getFieldError('phoneNumber') }}
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="dateOfBirth">Date of Birth *</label>
-          <input
-            type="date"
-            id="dateOfBirth"
-            formControlName="dateOfBirth"
-            class="form-control"
-            [class.error]="getFieldError('dateOfBirth')"
-          />
-          <div class="error-message" *ngIf="getFieldError('dateOfBirth')">
-            {{ getFieldError('dateOfBirth') }}
-          </div>
-          <div class="eligibility-message" *ngIf="ageMessage && !getFieldError('dateOfBirth')" 
-               [class.eligible]="isEligible" 
-               [class.ineligible]="!isEligible">
-            <i class="fas" [class.fa-check-circle]="isEligible" [class.fa-exclamation-circle]="!isEligible"></i>
-            {{ ageMessage }}
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="gender">Gender *</label>
-          <select
-            id="gender"
-            formControlName="gender"
-            class="form-control"
-            [class.error]="getFieldError('gender')"
-          >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-          <div class="error-message" *ngIf="getFieldError('gender')">
-            {{ getFieldError('gender') }}
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="address">Address *</label>
-        <textarea
-          id="address"
-          formControlName="address"
-          class="form-control textarea"
-          [class.error]="getFieldError('address')"
-          placeholder="Enter your complete address"
-          rows="3"
-        ></textarea>
-        <div class="error-message" *ngIf="getFieldError('address')">
-          {{ getFieldError('address') }}
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="wardId">Ward *</label>
-          <select
-            id="wardId"
-            formControlName="wardId"
-            class="form-control"
-            [class.error]="getFieldError('wardId')"
-          >
-            <option value="">Select your ward</option>
-            <option *ngFor="let ward of wards" [value]="ward.wardId">
-              {{ ward.wardName }}
-            </option>
-          </select>
-          <div class="error-message" *ngIf="getFieldError('wardId')">
-            {{ getFieldError('wardId') }}
-          </div>
-          <div *ngIf="loadingWards" class="loading-text">
-            Loading wards...
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="bloodGroup">Blood Group *</label>
-          <select
-            id="bloodGroup"
-            formControlName="bloodGroup"
-            class="form-control"
-            [class.error]="getFieldError('bloodGroup')"
-          >
-            <option value="">Select Blood Group</option>
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-            <option value="O+">O+</option>
-            <option value="O-">O-</option>
-          </select>
-          <div class="error-message" *ngIf="getFieldError('bloodGroup')">
-            {{ getFieldError('bloodGroup') }}
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="aadharCardLink">Upload Proof (Aadhar Card) - Google Drive Link *</label>
-        <input
-          type="url"
-          id="aadharCardLink"
-          formControlName="aadharCardLink"
-          class="form-control"
-          [class.error]="getFieldError('aadharCardLink')"
-          placeholder="https://drive.google.com/file/d/..."
-        />
-        <!-- <div class="field-help">
-          <i class="fas fa-info-circle"></i>
-          Please upload your Aadhar Card to Google Drive and share the public link here
-        </div> -->
-        <div class="error-message" *ngIf="getFieldError('aadharCardLink')">
-          {{ getFieldError('aadharCardLink') }}
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="profilePictureLink">Upload Profile Picture (Google Drive Link)</label>
-        <input
-          type="url"
-          id="profilePictureLink"
-          formControlName="profilePictureLink"
-          class="form-control"
-          [class.error]="getFieldError('profilePictureLink')"
-          placeholder="https://drive.google.com/file/d/..."
-        />
-        <!-- <div class="field-help">
-          <i class="fas fa-info-circle"></i>
-          Please upload your profile picture to Google Drive and share the public link here (Optional)
-        </div> -->
-        <div class="error-message" *ngIf="getFieldError('profilePictureLink')">
-          {{ getFieldError('profilePictureLink') }}
-        </div>
-      </div>
-
-
-
-      <div class="error-message general-error" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
-
-      <div class="success-message" *ngIf="successMessage">
-        <i class="fas fa-check-circle"></i>
-        {{ successMessage }}
-      </div>
-
-      <div class="form-actions">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="goBack()"
-          [disabled]="isLoading"
-        >
-          Cancel
+  <!-- Right Side: Form -->
+  <div class="right-panel">
+    <div class="form-container">
+      <div class="form-header">
+        <button class="btn-back" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> Back
         </button>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="isLoading || !isFormValid"
-        >
-          <span *ngIf="isLoading" class="spinner"></span>
-          {{ isLoading ? 'Registering...' : 'Register as Voter' }}
-        </button>
+        <h2>New Voter Registration</h2>
+        <p>Complete your profile to get verified.</p>
       </div>
-    </form>
+
+      <form [formGroup]="voterForm" (ngSubmit)="onSubmit()" class="registration-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Email Address</mat-label>
+            <input matInput formControlName="email" placeholder="name@example.com">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Phone Number</mat-label>
+            <input matInput formControlName="phoneNumber" placeholder="+91 ...">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <div class="flex-col w-full">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Date of Birth</mat-label>
+              <mat-datepicker-toggle matPrefix [for]="dobPicker"></mat-datepicker-toggle>
+              <input matInput [matDatepicker]="dobPicker" formControlName="dateOfBirth">
+              <mat-datepicker #dobPicker></mat-datepicker>
+            </mat-form-field>
+
+            <div class="eligibility-message" *ngIf="ageMessage && !getFieldError('dateOfBirth')"
+              [class.eligible]="isEligible" [class.ineligible]="!isEligible">
+              <i class="fas" [class.fa-check-circle]="isEligible" [class.fa-exclamation-circle]="!isEligible"></i>
+              {{ ageMessage }}
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Gender</mat-label>
+            <mat-select formControlName="gender">
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+              <mat-option value="Other">Other</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Address</mat-label>
+          <textarea matInput formControlName="address" placeholder="Enter your full residential address"
+            rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="form-row">
+          <div class="flex-col w-full">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Ward</mat-label>
+              <mat-select formControlName="wardId">
+                <mat-option *ngFor="let ward of wards" [value]="ward.wardId">{{ ward.wardName }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="loadingWards" class="loading-text">Loading wards...</div>
+          </div>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Blood Group</mat-label>
+            <mat-select formControlName="bloodGroup">
+              <mat-option value="A+">A+</mat-option>
+              <mat-option value="A-">A-</mat-option>
+              <mat-option value="B+">B+</mat-option>
+              <mat-option value="B-">B-</mat-option>
+              <mat-option value="AB+">AB+</mat-option>
+              <mat-option value="AB-">AB-</mat-option>
+              <mat-option value="O+">O+</mat-option>
+              <mat-option value="O-">O-</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Aadhar Card Proof (Drive Link)</mat-label>
+          <input matInput formControlName="aadharCardLink" placeholder="https://drive.google.com/...">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Profile Picture (Drive Link)</mat-label>
+          <input matInput formControlName="profilePictureLink" placeholder="https://drive.google.com/...">
+        </mat-form-field>
+
+        <div class="error-message general-error" *ngIf="errorMessage">
+          <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+        </div>
+
+        <div class="success-message" *ngIf="successMessage">
+          <i class="fas fa-check-circle"></i> {{ successMessage }}
+        </div>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="isLoading || !isFormValid"
+            class="btn-submit-mat">
+            <span *ngIf="isLoading" class="spinner"></span>
+            {{ isLoading ? 'Processing...' : 'Register Now' }}
+            <mat-icon *ngIf="!isLoading">arrow_forward</mat-icon>
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

@@ -11,5 +11,6 @@ export const routes: Routes = [
   { path: 'admin', loadComponent: () => import('./components/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent) },
   { path: 'vote', loadComponent: () => import('./components/voting/voting.component').then(m => m.VotingComponent) },
   { path: 'vote/:electionId', loadComponent: () => import('./components/voting/voting.component').then(m => m.VotingComponent) },
+  { path: 'create-election', loadComponent: () => import('./components/create-election/create-election.component').then(m => m.CreateElectionComponent) },
   { path: '**', redirectTo: '/signin' }
 ];

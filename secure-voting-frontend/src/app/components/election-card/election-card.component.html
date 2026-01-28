@@ -1,55 +1,45 @@
-<div class="election-card" [class]="getStatusColor()">
-  <div class="election-header">
-    <h3 class="election-title">{{ election.name }}</h3>
-    <div class="election-status" [class]="getStatusColor()">
+<div class="election-card" [ngClass]="getStatusColor()">
+  <div class="header-row">
+    <div class="title-wrap">
+      <h3>{{ election.name }}</h3>
+    </div>
+    <div class="status-pill" [ngClass]="getStatusColor()">
       {{ getStatusText() }}
     </div>
   </div>
 
-  <div class="election-description">
-    <p class="status-description">{{ getStatusDescription() }}</p>
-  </div>
+  <div class="card-content">
+    <p class="desc">{{ getStatusDescription() }}</p>
 
-  <div class="election-details">
-    <div class="detail-item">
-      <span class="detail-label">Start Date:</span>
-      <span class="detail-value">{{ formattedStartDate }}</span>
-    </div>
-    
-    <div class="detail-item">
-      <span class="detail-label">End Date:</span>
-      <span class="detail-value">{{ formattedEndDate }}</span>
-    </div>
-    
-    <div class="detail-item">
-      <span class="detail-label">Time Remaining:</span>
-      <span class="detail-value time-remaining">{{ timeRemaining }}</span>
+    <div class="details-block">
+      <div class="detail-row">
+        <span class="lbl">Start</span>
+        <span class="val">{{ formattedStartDate }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="lbl">End</span>
+        <span class="val">{{ formattedEndDate }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="lbl">Remaining</span>
+        <span class="val highlight">{{ timeRemaining }}</span>
+      </div>
     </div>
   </div>
 
-
-  <div class="election-actions">
-    <!-- <button 
-      class="btn btn-secondary" 
-      (click)="onViewDetails()"
-    >
-      View Details
-    </button> -->
-    
-    <button 
-      *ngIf="isEligible"
-      class="btn btn-primary" 
-      (click)="onVoteClick()"
-    >
-      Vote Now
+  <div class="card-actions">
+    <button *ngIf="isEligible" class="btn-action btn-primary" (click)="onVoteClick()">
+      <span>Vote Now</span>
+      <i class="fas fa-arrow-right"></i>
     </button>
-    
-    <button 
-      *ngIf="hasVoted"
-      class="btn btn-success" 
-      disabled
-    >
-      ✓ Voted
+
+    <button *ngIf="hasVoted" class="btn-action btn-success" disabled>
+      <i class="fas fa-check"></i>
+      <span>Voted</span>
+    </button>
+
+    <button *ngIf="!isEligible && !hasVoted" class="btn-action btn-disabled" disabled>
+      <span>{{ getStatusText() }}</span>
     </button>
   </div>
 </div>

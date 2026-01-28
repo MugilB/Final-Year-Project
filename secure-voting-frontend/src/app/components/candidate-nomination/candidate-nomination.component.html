@@ -1,258 +1,154 @@
-<div class="nomination-container">
-  <div class="nomination-card">
-    <div class="nomination-header">
-      <button class="btn-back" (click)="goBack()">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h2>Candidate Nomination</h2>
-      <p>Fill out the form below to nominate yourself as a candidate</p>
-    </div>
+<div class="split-layout">
+  <!-- Left Side: Animation & Content -->
+  <div class="left-panel">
+    <div class="panel-content">
+      <div class="brand-badge">
+        <i class="fas fa-vote-yea"></i> SecureVote
+      </div>
 
-    <form [formGroup]="candidateForm" (ngSubmit)="onSubmit()" class="nomination-form">
-      <div class="form-row">
-    <div class="form-group">
-      <label for="electionId">Select Election *</label>
-      <select
-        id="electionId"
-        formControlName="electionId"
-        class="form-control"
-        [class.error]="getFieldError('electionId')"
-        [disabled]="loadingElections"
-      >
-        <option value="">Choose an election...</option>
-        <option *ngFor="let election of elections" [value]="election.electionId">
-          {{ election.name }} - {{ formatDate(election.startDate) }}
-        </option>
-      </select>
-      <div class="error-message" *ngIf="getFieldError('electionId')">
-        {{ getFieldError('electionId') }}
+      <div class="hero-content">
+        <h1>Lead The <br><span>Future</span></h1>
+        <p>Nominate yourself as a candidate and be the change you wish to see. Your leadership matters.</p>
       </div>
-      <div class="field-help" *ngIf="loadingElections">
-        <i class="fas fa-spinner fa-spin"></i>
-        Loading elections...
-      </div>
-      <div class="field-help" *ngIf="!loadingElections && elections.length === 0">
-        <i class="fas fa-info-circle"></i>
-        No elections are currently open for nominations.
+
+      <div class="animation-stage">
+        <div class="podium">
+          <div class="podium-base"></div>
+          <div class="podium-top">
+            <div class="star-icon"><i class="fas fa-star"></i></div>
+          </div>
+        </div>
+        <div class="confetti c1"></div>
+        <div class="confetti c2"></div>
+        <div class="confetti c3"></div>
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="candidateName">Candidate Name *</label>
-      <input
-        type="text"
-        id="candidateName"
-        formControlName="candidateName"
-        class="form-control"
-        [class.error]="getFieldError('candidateName')"
-        placeholder="Enter your full name"
-      />
-      <div class="error-message" *ngIf="getFieldError('candidateName')">
-        {{ getFieldError('candidateName') }}
-      </div>
-    </div>
+    <!-- Background Abstract Elements -->
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="glass-overlay"></div>
+  </div>
 
-        <div class="form-group">
-          <label for="gender">Gender *</label>
-          <select
-            id="gender"
-            formControlName="gender"
-            class="form-control"
-            [class.error]="getFieldError('gender')"
-          >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-          <div class="error-message" *ngIf="getFieldError('gender')">
-            {{ getFieldError('gender') }}
-          </div>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="age">Age *</label>
-          <input
-            type="number"
-            id="age"
-            formControlName="age"
-            class="form-control"
-            [class.error]="getFieldError('age')"
-            placeholder="Enter your age"
-            min="18"
-            max="100"
-          />
-          <div class="error-message" *ngIf="getFieldError('age')">
-            {{ getFieldError('age') }}
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="phoneNumber">Phone Number *</label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            formControlName="phoneNumber"
-            class="form-control"
-            [class.error]="getFieldError('phoneNumber')"
-            placeholder="Enter your phone number"
-          />
-          <div class="error-message" *ngIf="getFieldError('phoneNumber')">
-            {{ getFieldError('phoneNumber') }}
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="email">Email Address *</label>
-        <input
-          type="email"
-          id="email"
-          formControlName="email"
-          class="form-control"
-          [class.error]="getFieldError('email')"
-          placeholder="Enter your email address"
-        />
-        <div class="error-message" *ngIf="getFieldError('email')">
-          {{ getFieldError('email') }}
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="address">Address *</label>
-        <textarea
-          id="address"
-          formControlName="address"
-          class="form-control textarea"
-          [class.error]="getFieldError('address')"
-          placeholder="Enter your complete address"
-          rows="3"
-        ></textarea>
-        <div class="error-message" *ngIf="getFieldError('address')">
-          {{ getFieldError('address') }}
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="party">Political Party *</label>
-          <select
-            id="party"
-            formControlName="party"
-            class="form-control"
-            [class.error]="getFieldError('party')"
-          >
-            <option value="">Select Political Party</option>
-            <option value="Independent Candidate">Independent Candidate</option>
-            <option value="Other">Other (Specify below)</option>
-          </select>
-          <div class="error-message" *ngIf="getFieldError('party')">
-            {{ getFieldError('party') }}
-          </div>
-        </div>
-
-        <div class="form-group" *ngIf="candidateForm.get('party')?.value === 'Other'">
-          <label for="customParty">Specify Political Party *</label>
-          <input
-            type="text"
-            id="customParty"
-            formControlName="customParty"
-            class="form-control"
-            [class.error]="getFieldError('customParty')"
-            placeholder="Enter your political party name"
-          />
-          <div class="error-message" *ngIf="getFieldError('customParty')">
-            {{ getFieldError('customParty') }}
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="partySecretCode">Party Secret Code *</label>
-          <input
-            type="password"
-            id="partySecretCode"
-            formControlName="partySecretCode"
-            class="form-control"
-            [class.error]="getFieldError('partySecretCode')"
-            [placeholder]="getSecretCodePlaceholder()"
-          />
-          <div class="field-help" *ngIf="candidateForm.get('party')?.value === 'Independent Candidate'">
-            <i class="fas fa-info-circle"></i>
-            For Independent Candidates, use: <strong>INDEPENDENT_SECRET_2024</strong>
-          </div>
-          <div class="error-message" *ngIf="getFieldError('partySecretCode')">
-            {{ getFieldError('partySecretCode') }}
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="aadharCardLink">Upload Aadhar Card (Google Drive Link) *</label>
-        <input
-          type="url"
-          id="aadharCardLink"
-          formControlName="aadharCardLink"
-          class="form-control"
-          [class.error]="getFieldError('aadharCardLink')"
-          placeholder="https://drive.google.com/file/d/..."
-        />
-        <!-- <div class="field-help">
-          <i class="fas fa-info-circle"></i>
-          Please upload your Aadhar Card to Google Drive and share the public link here
-        </div> -->
-        <div class="error-message" *ngIf="getFieldError('aadharCardLink')">
-          {{ getFieldError('aadharCardLink') }}
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="candidateImageLink">Upload Candidate Image (Google Drive Link)</label>
-        <input
-          type="url"
-          id="candidateImageLink"
-          formControlName="candidateImageLink"
-          class="form-control"
-          [class.error]="getFieldError('candidateImageLink')"
-          placeholder="https://drive.google.com/file/d/..."
-        />
-        <!-- <div class="field-help">
-          <i class="fas fa-info-circle"></i>
-          Please upload your professional photo to Google Drive and share the public link here (Optional)
-        </div> -->
-        <div class="error-message" *ngIf="getFieldError('candidateImageLink')">
-          {{ getFieldError('candidateImageLink') }}
-        </div>
-      </div>
-
-      <div class="error-message general-error" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
-
-      <div class="success-message" *ngIf="successMessage">
-        <i class="fas fa-check-circle"></i>
-        {{ successMessage }}
-      </div>
-
-      <div class="form-actions">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="goBack()"
-          [disabled]="isLoading"
-        >
-          Cancel
+  <!-- Right Side: Form -->
+  <div class="right-panel">
+    <div class="form-container">
+      <div class="form-header">
+        <button class="btn-back" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> Back
         </button>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="isLoading || candidateForm.invalid"
-        >
-          <span *ngIf="isLoading" class="spinner"></span>
-          {{ isLoading ? 'Submitting...' : 'Submit Nomination' }}
-        </button>
+        <h2>Candidate Nomination</h2>
+        <p>Submit your application to stand for election.</p>
       </div>
-    </form>
+
+      <form [formGroup]="candidateForm" (ngSubmit)="onSubmit()" class="nomination-form">
+
+        <div class="form-row">
+          <div class="flex-col w-full full-width">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Select Election</mat-label>
+              <mat-select formControlName="electionId" [disabled]="loadingElections">
+                <mat-option value="">Choose an election...</mat-option>
+                <mat-option *ngFor="let election of elections" [value]="election.electionId">
+                  {{ election.name }} - {{ formatDate(election.startDate) }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Full Name</mat-label>
+            <input matInput formControlName="candidateName" placeholder="Candidate Name">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Gender</mat-label>
+            <mat-select formControlName="gender">
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+              <mat-option value="Other">Other</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Age</mat-label>
+            <input matInput type="number" formControlName="age" placeholder="Age" min="18" max="100">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Phone Number</mat-label>
+            <input matInput type="tel" formControlName="phoneNumber" placeholder="+91 ...">
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="name@example.com">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Address</mat-label>
+          <textarea matInput formControlName="address" placeholder="Enter your full residential address"
+            rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Political Party</mat-label>
+            <mat-select formControlName="party">
+              <mat-option value="Independent Candidate">Independent Candidate</mat-option>
+              <mat-option value="Other">Other (Specify)</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full" *ngIf="candidateForm.get('party')?.value === 'Other'">
+            <mat-label>Specify Party</mat-label>
+            <input matInput formControlName="customParty" placeholder="Party Name">
+          </mat-form-field>
+
+          <div class="flex-col w-full">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Party Secret Code</mat-label>
+              <input matInput type="password" formControlName="partySecretCode"
+                [placeholder]="getSecretCodePlaceholder()">
+            </mat-form-field>
+            <div class="field-help" *ngIf="candidateForm.get('party')?.value === 'Independent Candidate'">
+              Use: <strong>INDEPENDENT_SECRET_2024</strong>
+            </div>
+          </div>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Aadhar Card Proof (Drive Link)</mat-label>
+          <input matInput type="url" formControlName="aadharCardLink" placeholder="https://drive.google.com/...">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Candidate Image (Drive Link)</mat-label>
+          <input matInput type="url" formControlName="candidateImageLink" placeholder="https://drive.google.com/...">
+        </mat-form-field>
+
+        <div class="error-message general-error" *ngIf="errorMessage">
+          <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+        </div>
+
+        <div class="success-message" *ngIf="successMessage">
+          <i class="fas fa-check-circle"></i> {{ successMessage }}
+        </div>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" type="submit" [disabled]="isLoading || candidateForm.invalid"
+            class="btn-submit-mat">
+            <span *ngIf="isLoading" class="spinner"></span>
+            {{ isLoading ? 'Submitting...' : 'Submit Nomination' }}
+            <mat-icon *ngIf="!isLoading">send</mat-icon>
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

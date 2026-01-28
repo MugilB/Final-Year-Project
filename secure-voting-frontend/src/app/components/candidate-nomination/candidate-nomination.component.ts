@@ -4,10 +4,30 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+
 @Component({
   selector: 'app-candidate-nomination',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterLink, HttpClientModule],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    RouterLink,
+    HttpClientModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatIconModule,
+    MatButtonModule
+  ],
   templateUrl: './candidate-nomination.component.html',
   styleUrls: ['./candidate-nomination.component.css']
 })
@@ -44,13 +64,13 @@ export class CandidateNominationComponent implements OnInit {
     if (!control.value) {
       return null; // Let required validator handle empty values
     }
-    
+
     const value = control.value.toString().trim();
     // Check if the value contains any numbers (0-9)
     if (/\d/.test(value)) {
       return { containsNumbers: true };
     }
-    
+
     return null;
   }
 
@@ -61,7 +81,7 @@ export class CandidateNominationComponent implements OnInit {
   loadElections(): void {
     this.loadingElections = true;
     console.log('Loading elections from API...');
-    
+
     this.http.get('http://localhost:8081/api/elections/for-nominations')
       .subscribe({
         next: (elections: any) => {
@@ -82,18 +102,18 @@ export class CandidateNominationComponent implements OnInit {
   partyValidation(form: FormGroup) {
     const party = form.get('party');
     const customParty = form.get('customParty');
-    
+
     if (party?.value === 'Other') {
       if (!customParty?.value || customParty.value.trim().length < 2) {
         customParty?.setErrors({ required: true });
         return { customPartyRequired: true };
       }
     }
-    
+
     if (customParty?.hasError('required')) {
       customParty.setErrors(null);
     }
-    
+
     return null;
   }
 
@@ -104,7 +124,7 @@ export class CandidateNominationComponent implements OnInit {
       this.successMessage = '';
 
       const formData = this.candidateForm.value;
-      
+
       // Determine the final party name
       let finalPartyName = formData.party;
       if (formData.party === 'Other' && formData.customParty) {
@@ -129,14 +149,14 @@ export class CandidateNominationComponent implements OnInit {
           next: (response: any) => {
             this.isLoading = false;
             this.successMessage = response.message || 'Candidate nomination submitted successfully! We will review your application and get back to you.';
-            
+
             // Reset form after successful submission
             this.candidateForm.reset();
           },
           error: (error) => {
             this.isLoading = false;
             console.error('Error submitting nomination:', error);
-            
+
             if (error.error && error.error.error) {
               this.errorMessage = error.error.error;
             } else {

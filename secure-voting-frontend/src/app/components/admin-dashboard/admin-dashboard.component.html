@@ -1,78 +1,171 @@
 <div class="admin-dashboard">
-  <!-- Sidebar -->
-  <aside class="sidebar">
+  <!-- Decorative Backgrounds -->
+  <div class="bg-shape shape-1" *ngIf="!isSidebarCollapsed"></div>
+  <!-- <div class="bg-shape shape-2"></div> -->
+  <div class="bg-shape shape-3"></div>
+  <!-- Sidebar Navigation -->
+  <!-- Collapsible Sidebar Navigation -->
+  <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <!-- Header -->
     <div class="sidebar-header">
-      <div class="logo">
-        <i class="fas fa-shield-alt"></i>
+      <div class="brand-container">
+        <div class="logo">
+          <span>A</span>
+        </div>
+        <div class="brand-info">
+          <span class="company-name">Admin Panel</span>          
+        </div>
       </div>
-    </div>
-    
-    <nav class="sidebar-nav">
-      <ul class="nav-list">
-        <li class="nav-item" [class.active]="activeSection === 'dashboard'">
-          <a (click)="setActiveSection('dashboard')" class="nav-link" matTooltip="Dashboard" matTooltipPosition="right">
-            <i class="fas fa-chart-pie"></i>
-          </a>
-        </li>
-        <li class="nav-item" [class.active]="activeSection === 'elections'">
-          <a (click)="setActiveSection('elections')" class="nav-link" matTooltip="Elections" matTooltipPosition="right">
-            <i class="fas fa-vote-yea"></i>
-          </a>
-        </li>
-        <li class="nav-item" [class.active]="activeSection === 'candidates'">
-          <a (click)="setActiveSection('candidates')" class="nav-link" matTooltip="Candidates" matTooltipPosition="right">
-            <i class="fas fa-user-tie"></i>
-          </a>
-        </li>
-        <li class="nav-item" [class.active]="activeSection === 'voters'">
-          <a (click)="setActiveSection('voters')" class="nav-link" matTooltip="Pending Voter Approval" matTooltipPosition="right">
-            <i class="fas fa-user-check"></i>
-          </a>
-        </li>
-        <li class="nav-item" [class.active]="activeSection === 'users'">
-          <a (click)="setActiveSection('users')" class="nav-link" matTooltip="Users" matTooltipPosition="right">
-            <i class="fas fa-users"></i>
-          </a>
-        </li>
-        <li class="nav-item" [class.active]="activeSection === 'blockchain'">
-          <a (click)="setActiveSection('blockchain')" class="nav-link" matTooltip="Blockchain" matTooltipPosition="right">
-            <i class="fas fa-link"></i>
-          </a>
-        </li>
-        <!-- <li class="nav-item" [class.active]="activeSection === 'analytics'">
-          <a (click)="setActiveSection('analytics')" class="nav-link" matTooltip="Analytics" matTooltipPosition="right">
-            <i class="fas fa-chart-bar"></i>
-          </a>
-        </li>
-        <li class="nav-item" [class.active]="activeSection === 'settings'">
-          <a (click)="setActiveSection('settings')" class="nav-link" matTooltip="Settings" matTooltipPosition="right">
-            <i class="fas fa-cog"></i>
-          </a>
-        </li> -->
-      </ul>
-    </nav>
-    
-    <div class="sidebar-footer">
-      <button class="logout-btn" (click)="signOut()" matTooltip="Sign Out" matTooltipPosition="right">
-        <i class="fas fa-sign-out-alt"></i>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        <i class="fas" [class.fa-chevron-left]="!isSidebarCollapsed" [class.fa-chevron-right]="isSidebarCollapsed"></i>
       </button>
+    </div>
+
+    <!-- Search (Mock) -->
+    <!-- <div class="sidebar-search" *ngIf="!isSidebarCollapsed">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search">
+    </div> -->
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+
+      <!-- Group: DASHBOARD -->
+      <div class="nav-group">
+        <div class="group-label" *ngIf="!isSidebarCollapsed">OVERVIEW</div>
+        <ul class="nav-list">
+          <li class="nav-item" [class.active]="activeSection === 'dashboard'">
+            <a (click)="setActiveSection('dashboard')" class="nav-link" matTooltip="Dashboard"
+              [matTooltipDisabled]="!isSidebarCollapsed" matTooltipPosition="right">
+              <i class="fas fa-border-all"></i>
+              <span class="link-text">Dashboard</span>
+            </a>
+          </li>
+          <!-- <li class="nav-item" [class.active]="activeSection === 'analytics'">
+            <a (click)="setActiveSection('analytics')" class="nav-link" matTooltip="Analytics"
+              [matTooltipDisabled]="!isSidebarCollapsed" matTooltipPosition="right">
+              <i class="far fa-chart-bar"></i>
+              <span class="link-text">Analytics</span>
+            </a>
+          </li> -->
+        </ul>
+      </div>
+
+      <!-- Group: ELECTION MANAGEMENT -->
+      <div class="nav-group">
+        <div class="group-label" *ngIf="!isSidebarCollapsed">ELECTION</div>
+        <ul class="nav-list">
+          <li class="nav-item" [class.active]="activeSection === 'elections'">
+            <a (click)="setActiveSection('elections')" class="nav-link" matTooltip="Elections"
+              [matTooltipDisabled]="!isSidebarCollapsed" matTooltipPosition="right">
+              <i class="far fa-check-square"></i>
+              <span class="link-text">Elections</span>
+            </a>
+          </li>
+          <li class="nav-item" [class.active]="activeSection === 'candidates'">
+            <a (click)="setActiveSection('candidates')" class="nav-link" matTooltip="Candidates"
+              [matTooltipDisabled]="!isSidebarCollapsed" matTooltipPosition="right">
+              <i class="far fa-user"></i>
+              <span class="link-text">Candidates</span>
+            </a>
+          </li>
+          <li class="nav-item" [class.active]="activeSection === 'voters'">
+            <a (click)="setActiveSection('voters')" class="nav-link" matTooltip="Voters"
+              [matTooltipDisabled]="!isSidebarCollapsed" matTooltipPosition="right">
+              <i class="far fa-id-card"></i>
+              <span class="link-text">Voters</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Group: SYSTEM -->
+      <div class="nav-group">
+        <div class="group-label" *ngIf="!isSidebarCollapsed">SYSTEM</div>
+        <ul class="nav-list">
+          <li class="nav-item" [class.active]="activeSection === 'blockchain'">
+            <a (click)="setActiveSection('blockchain')" class="nav-link" matTooltip="Blockchain"
+              [matTooltipDisabled]="!isSidebarCollapsed" matTooltipPosition="right">
+              <i class="fas fa-cubes"></i>
+              <span class="link-text">Blockchain</span>
+            </a>
+          </li>
+          <li class="nav-item" [class.active]="activeSection === 'users'">
+            <a (click)="setActiveSection('users')" class="nav-link" matTooltip="User Management"
+              [matTooltipDisabled]="!isSidebarCollapsed" matTooltipPosition="right">
+              <i class="far fa-user-circle"></i>
+              <span class="link-text">Users</span>
+            </a>
+          </li>
+          <!-- <li class="nav-item" [class.active]="activeSection === 'settings'">
+            <a (click)="setActiveSection('settings')" class="nav-link" matTooltip="Settings"
+              [matTooltipDisabled]="!isSidebarCollapsed" matTooltipPosition="right">
+              <i class="fas fa-sliders-h"></i>
+              <span class="link-text">Settings</span>
+            </a>
+          </li> -->
+        </ul>
+      </div>
+
+    </nav>
+
+    <!-- Footer Profile (Optional, layout shows bottom area empty or profile, I'll keep logout for now but styled simpler) -->
+    <!-- Footer Actions -->
+    <div class="sidebar-footer">
+      <div class="footer-actions">
+        <!-- Logout Button -->
+        <button class="footer-btn logout-action" (click)="signOut()" matTooltip="Sign Out"
+          [matTooltipDisabled]="!isSidebarCollapsed" matTooltipPosition="right">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="link-text" *ngIf="!isSidebarCollapsed">Log Out</span>
+        </button>
+      </div>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="main-content">
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
     <!-- Dashboard Section -->
     <section class="content-section dashboard-section" *ngIf="activeSection === 'dashboard'">
-      <div class="section-header">
-        <h1>Dashboard Overview</h1>
-        <div class="header-actions">
-          <button class="btn btn-outline" (click)="goToUserDashboard()">
-            <i class="fas fa-external-link-alt"></i>
-            User View
-          </button>
-        </div>
+      <!-- Welcome Card -->
+      <!-- Top Controls (Floating) -->
+      <div class="top-controls">
+        <button class="user-profile-badge" (click)="goToUserDashboard()">
+          <span class="user-name">User View</span>
+          <div class="user-avatar-circle">
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </button>
       </div>
-      
+
+      <!-- Hero Banner -->
+      <section class="hero-banner admin-banner">
+        <div class="banner-content">
+          <div class="text-content">
+            <span class="welcome-label">Welcome,</span>
+            <h1 class="user-name-display">Admin</h1>
+            <p class="subtitle">Your secure dashboard for managing elections and candidates.</p>
+          </div>
+          <div class="banner-decoration">
+            <div class="circle shape-1"></div>
+            <div class="circle shape-2"></div>
+
+            <!-- Polling Animation -->
+            <div class="polling-animation">
+              <div class="ballot-paper">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="ballot-box">
+                <div class="box-lid"></div>
+                <div class="box-body">
+                  <i class="fas fa-vote-yea"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Stats Cards -->
       <div class="stats-grid">
         <div class="stat-card">
@@ -85,7 +178,7 @@
             <div class="stat-change positive">+2 this week</div>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-icon users">
             <i class="fas fa-users"></i>
@@ -96,7 +189,7 @@
             <div class="stat-change positive">+5 this week</div>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-icon blocks">
             <i class="fas fa-link"></i>
@@ -107,7 +200,7 @@
             <div class="stat-change positive">+12 today</div>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-icon votes">
             <i class="fas fa-check-circle"></i>
@@ -119,18 +212,20 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Charts Section -->
       <div class="charts-grid">
         <div class="chart-card">
+
           <app-voter-participation-chart [elections]="elections"></app-voter-participation-chart>
         </div>
-        
+
         <div class="chart-card">
+
           <app-voting-chart [elections]="elections"></app-voting-chart>
         </div>
       </div>
-      
+
       <!-- Recent Activity -->
       <div class="activity-section">
         <div class="section-header">
@@ -153,54 +248,37 @@
 
     <!-- Elections Section -->
     <section class="content-section" *ngIf="activeSection === 'elections'">
-      <div class="section-header">
-        <h1>Elections Management</h1>
-        <div class="header-actions">
+      <div class="management-toolbar-card">
+        <div class="toolbar-left">
+          <div class="filter-wrapper">
+            <span class="filter-label">Filter:</span>
+            <select #filterSelect class="chart-filter-select" (change)="onFilterChange(filterSelect.value)">
+              <option value="all" [selected]="selectedFilter === 'all'">All Elections ({{ getFilterCount('all') }})
+              </option>
+              <option value="active" [selected]="selectedFilter === 'active'">Active ({{ getFilterCount('active') }})
+              </option>
+              <option value="pending" [selected]="selectedFilter === 'pending'">Pending ({{ getFilterCount('pending')
+                }})</option>
+              <option value="ended" [selected]="selectedFilter === 'ended'">Ended ({{ getFilterCount('ended') }})
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="toolbar-actions">
           <button class="btn btn-outline" (click)="testBackendConnection()" title="Test Backend Connection">
             <i class="fas fa-wifi"></i>
-            Test Backend
           </button>
-          <button class="btn btn-outline" (click)="updateElectionStatuses()" [disabled]="isLoading" title="Update Election Statuses">
+          <button class="btn btn-outline" (click)="updateElectionStatuses()" [disabled]="isLoading"
+            title="Update Election Statuses">
             <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
             Update Statuses
           </button>
-          <button class="btn btn-primary" (click)="createElection()">
+          <button class="btn btn-create-neon" (click)="createElection()">
             <i class="fas fa-plus"></i>
             Create Election
           </button>
         </div>
-      </div>
-      
-      <!-- Filter Tabs -->
-      <div class="filter-tabs">
-        <button 
-          class="filter-tab" 
-          [class.active]="selectedFilter === 'all'"
-          (click)="onFilterChange('all')"
-        >
-          All Elections ({{ getFilterCount('all') }})
-        </button>
-        <button 
-          class="filter-tab" 
-          [class.active]="selectedFilter === 'active'"
-          (click)="onFilterChange('active')"
-        >
-          Active ({{ getFilterCount('active') }})
-        </button>
-        <button 
-          class="filter-tab" 
-          [class.active]="selectedFilter === 'pending'"
-          (click)="onFilterChange('pending')"
-        >
-          Pending ({{ getFilterCount('pending') }})
-        </button>
-        <button 
-          class="filter-tab" 
-          [class.active]="selectedFilter === 'ended'"
-          (click)="onFilterChange('ended')"
-        >
-          Ended ({{ getFilterCount('ended') }})
-        </button>
       </div>
 
       <!-- Elections Grid -->
@@ -212,7 +290,7 @@
               {{ getElectionStatus(election) | titlecase }}
             </span>
           </div>
-          
+
           <div class="election-details">
             <div class="detail-item">
               <span class="detail-label">Start Date:</span>
@@ -271,13 +349,12 @@
     <!-- Users Section -->
     <section class="content-section" *ngIf="activeSection === 'users'">
       <div class="section-header">
-        <h1>Users Management</h1>
         <div class="header-actions">
-          <button class="btn btn-outline" (click)="loadUsers()" [disabled]="isLoading" title="Refresh Users">
+          <button class="btn-neon-refresh" (click)="loadUsers()" [disabled]="isLoading" title="Refresh Users">
             <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
             Refresh
           </button>
-          <button class="btn btn-primary" (click)="createUser()">
+          <button class="btn-primary-neon" (click)="createUser()">
             <i class="fas fa-plus"></i>
             Create User
           </button>
@@ -336,85 +413,85 @@
     <!-- Blockchain Section -->
     <section class="content-section blockchain-section-wrapper" *ngIf="activeSection === 'blockchain'">
       <div class="section-header">
-        <h1>Blockchain Explorer</h1>
         <div class="header-actions">
-          <button class="btn btn-outline" (click)="refreshBlocks()">
-            <i class="fas fa-sync-alt"></i>
-            Refresh
+          <button class="btn-neon-refresh" (click)="loadBlocks()" title="Refresh Blockchain Data">
+            <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i> Refresh
           </button>
         </div>
       </div>
-      
-      <!-- Blockchain Stats -->
-      <div class="blockchain-stats">
-        <div class="stat-item">
+
+      <!-- Neon Stats Grid -->
+      <div class="blockchain-stats-grid">
+        <div class="stat-card-neon">
           <div class="stat-value">{{ totalBlocks }}</div>
           <div class="stat-label">Total Blocks</div>
         </div>
-        <div class="stat-item">
+        <div class="stat-card-neon blocks">
           <div class="stat-value">{{ latestBlock?.blockHeight || 0 }}</div>
-          <div class="stat-label">Latest Block Height</div>
+          <div class="stat-label">Latest Height</div>
         </div>
-        <div class="stat-item">
+        <div class="stat-card-neon integrity">
           <div class="stat-value">{{ getBlockchainIntegrity() }}%</div>
           <div class="stat-label">Chain Integrity</div>
         </div>
       </div>
-      
+
       <!-- Blocks Table -->
       <div class="blockchain-table-wrapper">
         <div class="table-container blockchain-table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Block Height</th>
-              <th>Hash</th>
-              <th>Previous Hash</th>
-              <th>Election ID</th>
-              <th>Election Name</th>
-              <th>Voter ID</th>
-              <th>Data</th>
-              <th>Timestamp</th>
-              <th>Nonce</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let block of blocks">
-              <td>{{ block.blockHeight }}</td>
-              <td>
-                <div class="hash-cell">
-                  <code [title]="block.hash">{{ block.hash.substring(0, 16) }}...</code>
-                  <button class="btn btn-xs btn-link" (click)="copyToClipboard(block.hash)" title="Copy full hash">
-                    <i class="fas fa-copy"></i>
-                  </button>
-                </div>
-              </td>
-              <td>
-                <div class="hash-cell">
-                  <code [title]="block.previousHash">{{ block.previousHash.substring(0, 16) }}...</code>
-                </div>
-              </td>
-              <td>{{ block.electionId || 'N/A' }}</td>
-              <td>{{ block.electionName || 'N/A' }}</td>
-              <td>{{ block.voterId }}</td>
-              <td>
-                <div class="data-cell">
-                  <span class="data-preview" [title]="block.data">{{ block.data.substring(0, 50) }}{{ block.data.length > 50 ? '...' : '' }}</span>
-                </div>
-              </td>
-              <td>{{ getFormattedDate(block.timestamp) }}</td>
-              <td>{{ block.nonce }}</td>
-              <td>
-                <div class="action-buttons">
-                  <button *ngIf="block.voterId !== 'SYSTEM'" class="btn btn-sm btn-primary" (click)="viewVote(block)" title="View Vote">
-                    <i class="fas fa-vote-yea"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Block Height</th>
+                <th>Hash</th>
+                <th>Previous Hash</th>
+                <th>Election ID</th>
+                <th>Election Name</th>
+                <th>Voter ID</th>
+                <th>Data</th>
+                <th>Timestamp</th>
+                <th>Nonce</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let block of blocks">
+                <td>{{ block.blockHeight }}</td>
+                <td>
+                  <div class="hash-cell">
+                    <code [title]="block.hash">{{ block.hash.substring(0, 16) }}...</code>
+                    <button class="btn btn-xs btn-link" (click)="copyToClipboard(block.hash)" title="Copy full hash">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </td>
+                <td>
+                  <div class="hash-cell">
+                    <code [title]="block.previousHash">{{ block.previousHash.substring(0, 16) }}...</code>
+                  </div>
+                </td>
+                <td>{{ block.electionId || 'N/A' }}</td>
+                <td>{{ block.electionName || 'N/A' }}</td>
+                <td>{{ block.voterId }}</td>
+                <td>
+                  <div class="data-cell">
+                    <span class="data-preview" [title]="block.data">{{ block.data.substring(0, 50) }}{{
+                      block.data.length > 50 ? '...' : '' }}</span>
+                  </div>
+                </td>
+                <td>{{ getFormattedDate(block.timestamp) }}</td>
+                <td>{{ block.nonce }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button *ngIf="block.voterId !== 'SYSTEM'" class="btn btn-sm btn-primary" (click)="viewVote(block)"
+                      title="View Vote">
+                      <i class="fas fa-vote-yea"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -430,7 +507,7 @@
           </button>
         </div>
       </div>
-      
+
       <!-- Analytics Grid -->
       <div class="analytics-grid">
         <div class="analytics-card">
@@ -469,7 +546,7 @@
       <div class="section-header">
         <h1>System Settings</h1>
       </div>
-      
+
       <div class="settings-grid">
         <div class="settings-card">
           <h3>General Settings</h3>
@@ -482,7 +559,7 @@
             <input type="number" value="7" class="form-input">
           </div>
         </div>
-        
+
         <div class="settings-card">
           <h3>Security Settings</h3>
           <div class="setting-item">
@@ -501,165 +578,81 @@
   <!-- Election Modal -->
   <div class="election-modal-overlay" *ngIf="showElectionModal" (click)="closeElectionModal()">
     <div class="election-modal-container" (click)="$event.stopPropagation()">
-      <!-- Modal Header -->
-      <div class="election-modal-header">
-        <div class="header-content">
-          <div class="header-icon">
-            <i class="fas fa-vote-yea"></i>
+      <!-- Split Layout Container -->
+      <div class="modal-split-layout">
+
+        <!-- Left Panel: Animation & Branding -->
+        <div class="modal-left-panel">
+          <div class="panel-brand">
+            <i class="fas fa-shield-alt"></i> SecureVote Admin
           </div>
-          <div class="header-text">
-            <h1 class="modal-title">{{ isEditingElection ? 'Edit Election' : 'Create New Election' }}</h1>
-            <p class="modal-subtitle">{{ isEditingElection ? 'Update election details and settings' : 'Set up a new election with candidates and voting period' }}</p>
+
+          <div class="panel-hero">
+            <h1>Create<br>Election</h1>
+            <p>Initialize a secure, blockchain-verified election event.</p>
+          </div>
+
+          <div class="modal-animation-stage">
+            <div class="neo-ballot-box">
+              <div class="neo-lid"></div>
+              <div class="neo-paper"><i class="fas fa-vote-yea"></i></div>
+            </div>
           </div>
         </div>
-        <button class="close-button" (click)="closeElectionModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <!-- Modal Content -->
-      <div class="election-modal-content">
-        <form class="election-form" (ngSubmit)="saveElection()" #electionForm="ngForm">
-          
-          <!-- Basic Information Card -->
-          <div class="info-card">
-            <div class="card-header">
-              <div class="card-icon">
-                <i class="fas fa-info-circle"></i>
-              </div>
-              <h3 class="card-title">Basic Information</h3>
-            </div>
-            <div class="card-content">
-              <div class="input-group">
-                <label class="input-label">
-                  <i class="fas fa-tag"></i>
-                  Election Name
-                  <span class="required">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  class="modern-input" 
-                  [(ngModel)]="electionFormData.name"
-                  name="electionName"
-                  placeholder="e.g., Presidential Election 2024"
-                  required
-                >
-                <div class="input-hint">Choose a clear, descriptive name for your election</div>
-              </div>
 
-              <div class="input-group">
-                <label class="input-label">
-                  <i class="fas fa-align-left"></i>
-                  Description
-                  <span class="required">*</span>
-                </label>
-                <textarea 
-                  class="modern-textarea" 
-                  [(ngModel)]="electionFormData.description"
-                  name="electionDescription"
-                  placeholder="Provide a detailed description of this election, including its purpose and scope..."
-                  rows="3"
-                  required
-                ></textarea>
-                <div class="input-hint">Help voters understand what this election is about</div>
-              </div>
-
-              <div class="input-group">
-                <label class="input-label">
-                  <i class="fas fa-gavel"></i>
-                  Rules & Guidelines
-                </label>
-                <textarea 
-                  class="modern-textarea" 
-                  [(ngModel)]="electionFormData.rules"
-                  name="electionRules"
-                  placeholder="Define the rules, guidelines, and procedures for this election..."
-                  rows="4"
-                ></textarea>
-                <div class="input-hint">Specify voting rules, eligibility criteria, and other important guidelines</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Schedule Card -->
-          <div class="info-card">
-            <div class="card-header">
-              <div class="card-icon">
-                <i class="fas fa-calendar-alt"></i>
-              </div>
-              <h3 class="card-title">Schedule & Duration</h3>
-            </div>
-            <div class="card-content">
-              <div class="date-time-grid">
-                <div class="input-group">
-                  <label class="input-label">
-                    <i class="fas fa-play"></i>
-                    Start Date & Time
-                    <span class="required">*</span>
-                  </label>
-                  <input 
-                    type="datetime-local" 
-                    class="modern-input" 
-                    [(ngModel)]="electionFormData.startDate"
-                    name="startDate"
-                    required
-                  >
-                  <div class="input-hint">When voting begins</div>
-                </div>
-
-                <div class="input-group">
-                  <label class="input-label">
-                    <i class="fas fa-stop"></i>
-                    End Date & Time
-                    <span class="required">*</span>
-                  </label>
-                  <input 
-                    type="datetime-local" 
-                    class="modern-input" 
-                    [(ngModel)]="electionFormData.endDate"
-                    name="endDate"
-                    required
-                  >
-                  <div class="input-hint">When voting closes</div>
-                </div>
-              </div>
-
-              <div class="duration-display" *ngIf="electionFormData.startDate && electionFormData.endDate">
-                <div class="duration-card">
-                  <div class="duration-icon">
-                    <i class="fas fa-clock"></i>
-                  </div>
-                  <div class="duration-text">
-                    <span class="duration-label">Election Duration</span>
-                    <span class="duration-value">{{ getElectionDuration() }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-
-        </form>
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="election-modal-footer">
-        <div class="footer-info">
-          <div class="security-badge">
-            <i class="fas fa-shield-alt"></i>
-            <span>Secured & Encrypted</span>
-          </div>
-        </div>
-        <div class="footer-actions">
-          <button type="button" class="btn-cancel" (click)="closeElectionModal()">
+        <!-- Right Panel: Form -->
+        <div class="modal-right-panel">
+          <button class="modal-close-btn" (click)="closeElectionModal()">
             <i class="fas fa-times"></i>
-            Cancel
           </button>
-          <button type="button" class="btn-save" (click)="saveElection()" [disabled]="isSaving">
-            <i class="fas fa-save" *ngIf="!isSaving"></i>
-            <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
-            {{ isSaving ? 'Saving...' : (isEditingElection ? 'Update Election' : 'Create Election') }}
-          </button>
+
+          <h2>{{ isEditingElection ? 'Edit Election' : 'Election Details' }}</h2>
+          <p class="modal-desc">Configure the election parameters below.</p>
+
+          <form class="election-form" (ngSubmit)="saveElection()" #electionForm="ngForm">
+
+            <div class="input-group">
+              <label class="input-label">Election Name <span class="required">*</span></label>
+              <input type="text" class="modern-input" [(ngModel)]="electionFormData.name" name="electionName"
+                placeholder="e.g. Annual Board Election" required>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Description <span class="required">*</span></label>
+              <textarea class="modern-textarea" [(ngModel)]="electionFormData.description" name="electionDescription"
+                placeholder="Brief description of the election..." rows="3" required></textarea>
+            </div>
+
+            <div class="date-time-grid">
+              <div class="input-group">
+                <label class="input-label">Start Date <span class="required">*</span></label>
+                <input type="datetime-local" class="modern-input" [(ngModel)]="electionFormData.startDate"
+                  name="startDate" required>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">End Date <span class="required">*</span></label>
+                <input type="datetime-local" class="modern-input" [(ngModel)]="electionFormData.endDate" name="endDate"
+                  required>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">Rules</label>
+              <textarea class="modern-textarea" [(ngModel)]="electionFormData.rules" name="electionRules"
+                placeholder="Specific rules or guidelines..." rows="2"></textarea>
+            </div>
+
+            <div class="modal-form-actions">
+              <button type="button" class="btn btn-outline btn-full" (click)="closeElectionModal()">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary btn-full" [disabled]="isSaving">
+                <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
+                {{ isSaving ? 'Processing...' : (isEditingElection ? 'Update' : 'Create Election') }}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -667,13 +660,8 @@
 </div>
 
 <!-- User Modal -->
-<app-user-modal
-  #userModal
-  [isOpen]="showUserModal"
-  [user]="editingUser"
-  [isEdit]="isEditMode"
-  (close)="closeUserModal()"
-  (save)="saveUser($event)">
+<app-user-modal #userModal [isOpen]="showUserModal" [user]="editingUser" [isEdit]="isEditMode"
+  (close)="closeUserModal()" (save)="saveUser($event)">
 </app-user-modal>
 
 <!-- Vote Modal -->
@@ -685,18 +673,18 @@
         <i class="fas fa-times"></i>
       </button>
     </div>
-    
+
     <div class="vote-card-body">
       <div *ngIf="isLoadingVote" class="loading-state">
         <div class="spinner"></div>
         <p>Decrypting vote data...</p>
       </div>
-      
+
       <div *ngIf="voteError" class="error-state">
         <i class="fas fa-exclamation-triangle"></i>
         <p>{{ voteError }}</p>
       </div>
-      
+
       <div *ngIf="decryptedVote && !isLoadingVote && !voteError" class="vote-details-card">
         <div class="vote-info-card">
           <h4 class="vote-section-title">Block Information</h4>
@@ -719,7 +707,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="vote-data-card">
           <h4 class="vote-section-title">Vote Data</h4>
           <div class="vote-content-list">
@@ -739,7 +727,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="vote-card-footer">
       <button class="btn btn-secondary" (click)="closeVoteModal()">
         <i class="fas fa-times"></i>
